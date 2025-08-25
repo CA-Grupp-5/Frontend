@@ -38,35 +38,51 @@ jobs:
       - name: 🏗 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🏗 Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "yarn"
+          node-version: '18'
 
-      - name: 📦 Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-
-      - name: 📦 Setup yarn cache
-        uses: actions/cache@v3
+      - name: Cache node modules
+        uses: actions/cache@v4
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json', 'package.json') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-node-
 
-      - name: 📦 Install dependencies
-        run: yarn install
+      - name: Install dependencies (bun or npm)
+        run: |
+          set -euo pipefail
+          if [ -f bun.lockb ]; then
+            echo "bun.lockb found — using bun"
+            if ! command -v bun >/dev/null 2>&1; then
+              echo "Installing bun"
+              curl -fsSL https://bun.sh/install | bash || true
+              export PATH="$HOME/.bun/bin:$PATH"
+            fi
+            if command -v bun >/dev/null 2>&1; then
+              bun install || npm install
+            else
+              echo "bun not available, falling back to npm"
+              npm ci || npm install || true
+            fi
+          elif [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+            echo "Using npm ci because a package-lock exists"
+            npm ci
+          else
+            echo "No lockfile found — running npm install (best effort)"
+            npm install
+          fi
 
       - name: 🧪 Run TypeScript check
-        run: yarn tsc
+        run: npx tsc --noEmit
 
       - name: 🧹 Run ESLint
-        run: yarn lint
+        run: npm run lint
 
       - name: 🎨 Run Prettier check
-        run: yarn format:check
+        run: npm run format:check
 
   build-and-deploy:
     needs: test
@@ -191,6 +207,17 @@ jobs:
             echo "metro.config.js updated to CommonJS format"
           else
             echo "metro.config.js not found"
+          fi
+
+      - name: 📦 Run expo prebuild (ensure native folders)
+        run: |
+          if [ -f delivra/package.json ]; then
+            echo "Running expo prebuild in delivra"
+            cd delivra
+            npx expo prebuild || true
+            cd ..
+          else
+            echo "delivra/package.json not found, skipping prebuild"
           fi
 
       - name: 📱 Build Development APK
