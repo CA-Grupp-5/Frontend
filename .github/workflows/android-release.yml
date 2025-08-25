@@ -48,21 +48,7 @@ jobs:
         working-directory: delivra
         run: npm ci
 
-      - name: (Optional) Inject signing keystore from secret
-        if: ${{ secrets.SIGNING_KEYSTORE }}
-        run: |
-          echo "Decoding keystore and writing gradle properties"
-          mkdir -p delivra/android
-          echo $SIGNING_KEYSTORE | base64 --decode > delivra/android/keystore.jks
-          echo "MYAPP_UPLOAD_STORE_FILE=keystore.jks" >> delivra/android/gradle.properties
-          echo "MYAPP_UPLOAD_KEY_ALIAS=${KEY_ALIAS}" >> delivra/android/gradle.properties
-          echo "MYAPP_UPLOAD_STORE_PASSWORD=${KEYSTORE_PASSWORD}" >> delivra/android/gradle.properties
-          echo "MYAPP_UPLOAD_KEY_PASSWORD=${KEY_PASSWORD}" >> delivra/android/gradle.properties
-        env:
-          SIGNING_KEYSTORE: ${{ secrets.SIGNING_KEYSTORE }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+  # Signing is intentionally skipped in CI since we are not publishing to the store
 
       - name: Build release APK
         working-directory: delivra/android
