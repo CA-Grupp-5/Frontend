@@ -55,8 +55,11 @@ jobs:
         run: |
           chmod +x gradlew
           set -o pipefail
-          # write log to absolute workspace path so later steps can find it reliably
-          ./gradlew clean assembleRelease --no-daemon 2>&1 | tee "$GITHUB_WORKSPACE/delivra/android/gradle-build.log"
+          # ensure workspace log path exists and create an empty file so upload step can always find it
+          mkdir -p "$GITHUB_WORKSPACE/delivra/android"
+          : > "$GITHUB_WORKSPACE/delivra/android/gradle-build.log"
+          # append gradle output to the workspace log
+          ./gradlew clean assembleRelease --no-daemon 2>&1 | tee -a "$GITHUB_WORKSPACE/delivra/android/gradle-build.log"
         env:
           NODE_ENV: production
 
