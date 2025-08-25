@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <!-- Consolidated AppTheme to avoid duplicate resource definitions -->
+   <!-- Consolidated AppTheme to avoid duplicate resource definitions -->
   <style name="AppTheme" parent="Theme.EdgeToEdge">
     <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
     <item name="colorPrimary">@color/colorPrimary</item>

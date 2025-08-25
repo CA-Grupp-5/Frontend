@@ -1,0 +1,1 @@
+Branched off from post successful apk build. Functioning apk . now onto building the apk with dev server and creating script for the local workflow.

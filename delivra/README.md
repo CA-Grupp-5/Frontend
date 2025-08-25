@@ -46,6 +46,32 @@ Developer experience first:
 - Node.js 22+ (Recommended LTS)
 - BUN IS VERY RECOMMENDED
 
+### Dev build shortcuts
+
+Two convenience scripts are available to run CI-style builds with Bun:
+
+- Debug/dev APK (includes expo dev client):
+
+```powershell
+# from repo root
+bun run dev
+```
+
+- Release APK (runs a release Gradle build):
+
+```powershell
+# from repo root
+bun run release
+```
+
+Both commands execute the PowerShell scripts in `./scripts`, perform `bun install` when Bun is available, and invoke the Gradle wrapper. If PowerShell execution is blocked by policy, run the script with an explicit bypass:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ./delivra/scripts/build-android-debug.ps1
+```
+
+To enable automatic signing for releases in CI, provide a keystore and the CI secret names; the release workflow can be configured to use those secrets.
+
 ### Contributions
 
 Contributions are welcome! If you find a bug or have suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/Teczer/expo-react-native-nativewind-typescript-boilerplate/issues). You can also submit pull requests with enhancements or fixes.

@@ -3,7 +3,9 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "expo start --dev-client",
+  "start": "expo start --dev-client",
+  "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-debug.ps1",
+  "release": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-release.ps1",
     "android": "bun expo run:android",
     "android:prebuild": "npx expo prebuild && bun expo run:android",
     "ios": "bun expo run:ios",
@@ -22,6 +24,7 @@
     "@expo/vector-icons": "^14.1.0",
     "@react-navigation/native": "^7.1.6",
     "expo": "^53.0.9",
+    "expo-dev-client": "^5.2.4",
     "expo-font": "~13.3.1",
     "expo-linking": "~7.1.5",
     "expo-router": "~5.0.7",
