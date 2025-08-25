@@ -1,0 +1,118 @@
+name: Android Release Build
+
+on:
+  push:
+    branches: [ main, test-build ]
+  pull_request:
+    branches: [ main, test-build ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: Cache node modules (delivra)
+        uses: actions/cache@v4
+        with:
+          path: delivra/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('delivra/package-lock.json', 'delivra/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install JS dependencies
+        working-directory: delivra
+        run: npm ci
+
+      - name: (Optional) Inject signing keystore from secret
+        if: ${{ secrets.SIGNING_KEYSTORE }}
+        run: |
+          echo "Decoding keystore and writing gradle properties"
+          mkdir -p delivra/android
+          echo $SIGNING_KEYSTORE | base64 --decode > delivra/android/keystore.jks
+          echo "MYAPP_UPLOAD_STORE_FILE=keystore.jks" >> delivra/android/gradle.properties
+          echo "MYAPP_UPLOAD_KEY_ALIAS=${KEY_ALIAS}" >> delivra/android/gradle.properties
+          echo "MYAPP_UPLOAD_STORE_PASSWORD=${KEYSTORE_PASSWORD}" >> delivra/android/gradle.properties
+          echo "MYAPP_UPLOAD_KEY_PASSWORD=${KEY_PASSWORD}" >> delivra/android/gradle.properties
+        env:
+          SIGNING_KEYSTORE: ${{ secrets.SIGNING_KEYSTORE }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Build release APK
+        working-directory: delivra/android
+        run: |
+          chmod +x gradlew
+          set -o pipefail
+          ./gradlew clean assembleRelease --no-daemon 2>&1 | tee gradle-build.log
+        env:
+          NODE_ENV: production
+
+      - name: Prepare build log for issue
+        if: failure()
+        run: |
+          # keep last 1000 lines to avoid huge issue bodies
+          tail -n 1000 gradle-build.log > gradle-build-short.log || true
+          # copy to repo-root so create-issue action can read it reliably
+          cp gradle-build-short.log $GITHUB_WORKSPACE/delivra/android/gradle-build-short.log || true
+
+      - name: Upload full build log as artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-log-${{ github.run_number }}
+          path: delivra/android/gradle-build.log
+
+      - name: Create issue body file (includes artifact link + short log)
+        if: failure()
+        run: |
+          ARTIFACTS_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
+          echo "CI build failed for run ${{ github.run_number }} on ref ${{ github.ref_name }}" > delivra/android/gradle-build-issue-body.md
+          echo "" >> delivra/android/gradle-build-issue-body.md
+          echo "Full build log artifact: $ARTIFACTS_URL" >> delivra/android/gradle-build-issue-body.md
+          echo "" >> delivra/android/gradle-build-issue-body.md
+          echo '---' >> delivra/android/gradle-build-issue-body.md
+          echo 'Truncated Gradle log (last 1000 lines):' >> delivra/android/gradle-build-issue-body.md
+          echo '```' >> delivra/android/gradle-build-issue-body.md
+          cat delivra/android/gradle-build-short.log >> delivra/android/gradle-build-issue-body.md || true
+          echo '```' >> delivra/android/gradle-build-issue-body.md
+
+      - name: Create GitHub issue with build log
+        if: failure()
+        uses: peter-evans/create-issue@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "CI: Android build failed on ${{ github.ref_name }} (run ${{ github.run_number }})"
+          body-file: delivra/android/gradle-build-issue-body.md
+          labels: ci-failure, android
+
+      - name: Upload release APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: delivra/android/app/build/outputs/apk/release/*.apk
