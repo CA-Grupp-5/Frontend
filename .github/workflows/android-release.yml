@@ -15,48 +15,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install node dependencies (bun or npm)
-        working-directory: delivra
-        run: |
-          set -euo pipefail
-          if [ -f bun.lockb ]; then
-            echo "bun.lockb found — using bun"
-            if ! command -v bun >/dev/null 2>&1; then
-              echo "Installing bun"
-              curl -fsSL https://bun.sh/install | bash || true
-              export PATH="$HOME/.bun/bin:$PATH"
-            fi
-            if command -v bun >/dev/null 2>&1; then
-              bun install || npm install
-            else
-              echo "bun not available, falling back to npm"
-              npm ci || npm install || true
-            fi
-          elif [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
-            echo "Using npm ci because a package-lock exists"
-            npm ci
-          else
-            echo "No lockfile found — running npm install (best effort)"
-            npm install
-          fi
-
-      - name: Make gradlew executable
-        run: chmod +x delivra/android/gradlew
-
-      - name: Build release APK
-        working-directory: delivra/android
-        run: ./gradlew clean assembleRelease
+      - name: React Native Android Build APK
+        uses: realabbas/Github-Actions-React-Native@v1.1.2
 
       - name: Upload release APK artifact
         uses: actions/upload-artifact@v4
