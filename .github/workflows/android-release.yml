@@ -33,35 +33,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
+      - name: Set Up JDK + Generate APK (composite)
+        uses: ./.github/actions/setup-jdk-generate-apk
         with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install JS dependencies
-        working-directory: delivra
-        run: npm ci
-
-  # Signing is intentionally skipped in CI since we are not publishing to the store
-
-      - name: Build release APK
-        working-directory: delivra/android
-        run: |
-          chmod +x gradlew
-          set -o pipefail
-          # ensure workspace log path exists and create an empty file so upload step can always find it
-          mkdir -p "$GITHUB_WORKSPACE/delivra/android"
-          : > "$GITHUB_WORKSPACE/delivra/android/gradle-build.log"
-          # append gradle output to the workspace log
-          ./gradlew clean assembleRelease --no-daemon 2>&1 | tee -a "$GITHUB_WORKSPACE/delivra/android/gradle-build.log"
-        env:
-          NODE_ENV: production
+          APP_ENV: 'staging'
 
       - name: Prepare short build log
         if: failure()

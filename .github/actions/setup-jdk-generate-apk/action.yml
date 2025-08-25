@@ -1,0 +1,65 @@
+name: 'Setup JDK + Gradle + Generate APK'
+description: 'Composite action that sets up JDK/Node/Gradle and generates an Android APK (writes gradle log to workspace)'
+inputs:
+  APP_ENV:
+    description: "APP_ENV (one of): development, staging, production"
+    required: true
+    default: 'staging'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set Up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install deps & prebuild (pnpm if available, fallback to npm)
+      shell: bash
+      run: |
+        set -euo pipefail
+        WORKDIR="$GITHUB_WORKSPACE/delivra"
+        if [ -d "$WORKDIR" ]; then
+          cd "$WORKDIR"
+        else
+          echo "delivra folder not found at $WORKDIR"; exit 0
+        fi
+
+        if [ -f pnpm-lock.yaml ]; then
+          corepack enable || true
+          corepack prepare pnpm@latest --activate || true
+          pnpm install --frozen-lockfile || pnpm install
+          pnpm run prebuild:${{ inputs.APP_ENV }} || true
+        else
+          npm ci || true
+          npm run prebuild:${{ inputs.APP_ENV }} || true
+        fi
+      env:
+        EXPO_NO_DOTENV: '1'
+        APP_ENV: ${{ inputs.APP_ENV }}
+        CI: 'true'
+
+    - name: Generate Test APK (Gradle)
+      shell: bash
+      run: |
+        set -euo pipefail
+        ANDROID_DIR="$GITHUB_WORKSPACE/delivra/android"
+        mkdir -p "$ANDROID_DIR"
+        cd "$ANDROID_DIR"
+        chmod +x ./gradlew
+        # ensure workspace log path exists and create an empty file
+        : > "$GITHUB_WORKSPACE/delivra/android/gradle-build.log"
+        ./gradlew assembleRelease --no-daemon 2>&1 | tee -a "$GITHUB_WORKSPACE/delivra/android/gradle-build.log"
+      env:
+        EXPO_NO_DOTENV: '1'
+        APP_ENV: ${{ inputs.APP_ENV }}
+        CI: 'true'
