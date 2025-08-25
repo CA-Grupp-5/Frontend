@@ -43,15 +43,16 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Cache node modules
+      - name: Cache node modules (delivra)
         uses: actions/cache@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json', 'package.json') }}
+          path: delivra/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('delivra/package-lock.json', 'delivra/package.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
       - name: Install dependencies (bun or npm)
+        working-directory: delivra
         run: |
           set -euo pipefail
           if [ -f bun.lockb ]; then
@@ -76,12 +77,15 @@ jobs:
           fi
 
       - name: 🧪 Run TypeScript check
+        working-directory: delivra
         run: npx tsc --noEmit
 
       - name: 🧹 Run ESLint
+        working-directory: delivra
         run: npm run lint
 
       - name: 🎨 Run Prettier check
+        working-directory: delivra
         run: npm run format:check
 
   build-and-deploy:
