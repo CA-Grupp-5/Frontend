@@ -59,13 +59,11 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Prepare build log for issue
+      - name: Prepare short build log
         if: failure()
         run: |
-          # keep last 1000 lines to avoid huge issue bodies
-          tail -n 1000 gradle-build.log > gradle-build-short.log || true
-          # copy to repo-root so create-issue action can read it reliably
-          cp gradle-build-short.log $GITHUB_WORKSPACE/delivra/android/gradle-build-short.log || true
+          # keep last 1000 lines to keep artifact small
+          tail -n 1000 gradle-build.log > delivra/android/gradle-build-short.log || true
 
       - name: Upload full build log as artifact
         if: failure()
@@ -74,28 +72,12 @@ jobs:
           name: gradle-build-log-${{ github.run_number }}
           path: delivra/android/gradle-build.log
 
-      - name: Create issue body file (includes artifact link + short log)
+      - name: Upload short build log as artifact
         if: failure()
-        run: |
-          ARTIFACTS_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
-          echo "CI build failed for run ${{ github.run_number }} on ref ${{ github.ref_name }}" > delivra/android/gradle-build-issue-body.md
-          echo "" >> delivra/android/gradle-build-issue-body.md
-          echo "Full build log artifact: $ARTIFACTS_URL" >> delivra/android/gradle-build-issue-body.md
-          echo "" >> delivra/android/gradle-build-issue-body.md
-          echo '---' >> delivra/android/gradle-build-issue-body.md
-          echo 'Truncated Gradle log (last 1000 lines):' >> delivra/android/gradle-build-issue-body.md
-          echo '```' >> delivra/android/gradle-build-issue-body.md
-          cat delivra/android/gradle-build-short.log >> delivra/android/gradle-build-issue-body.md || true
-          echo '```' >> delivra/android/gradle-build-issue-body.md
-
-      - name: Create GitHub issue with build log
-        if: failure()
-        uses: peter-evans/create-issue@v4
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: "CI: Android build failed on ${{ github.ref_name }} (run ${{ github.run_number }})"
-          body-file: delivra/android/gradle-build-issue-body.md
-          labels: ci-failure, android
+          name: gradle-build-short-${{ github.run_number }}
+          path: delivra/android/gradle-build-short.log
 
       - name: Upload release APK artifact
         uses: actions/upload-artifact@v4
