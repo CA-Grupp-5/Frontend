@@ -1,20 +1,3 @@
-# Fast Expo App CLI
-
-[![NPM version][npm-image]][npm-url]
-[![Downloads][downloads-image]][npm-url]
-
-<p align="center">
-  Get started by running <b><code>npx fast-expo-app@latest</code></b>
-</p>
-
-## Simple & Fast Starter for Expo, Nativewind, and TypeScript
-
-![](https://res.cloudinary.com/dw3mwclgk/image/upload/v1748088179/FAST-EXPO-APP.png)
-<p align="center">
-<b>
-This boilerplate provides a fast and modern setup for building React Native applications with Expo, NativeWind, and TypeScript. It's designed to enhance developer experience and streamline your development process.a
-</b>
-</p>
 
 ### Features
 
@@ -39,7 +22,6 @@ Developer experience first:
 - 💎 NativeWind 4.0
 - 🥟 Bun
 
-![](https://res.cloudinary.com/dw3mwclgk/image/upload/v1748011077/UPDATE.png)
 
 ### Requirements
 
@@ -72,20 +54,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ./delivra/scripts/build-andr
 
 To enable automatic signing for releases in CI, provide a keystore and the CI secret names; the release workflow can be configured to use those secrets.
 
-### Contributions
 
-Contributions are welcome! If you find a bug or have suggestions for improvements, please open an issue on the [GitHub repository](https://github.com/Teczer/expo-react-native-nativewind-typescript-boilerplate/issues). You can also submit pull requests with enhancements or fixes.
-
-### License
-
-Licensed under the MIT License, Copyright © 2025
-
-See [LICENSE](LICENSE) for more information.
-
----
-
-Made with ♥ by [Teczer](https://mehdihattou.com/)
-
-[downloads-image]: https://img.shields.io/npm/dm/fast-expo-app?color=364fc7&logoColor=364fc7
-[npm-url]: https://www.npmjs.com/package/fast-expo-app
-[npm-image]: https://img.shields.io/npm/v/fast-expo-app?color=0b7285&logoColor=0b7285
