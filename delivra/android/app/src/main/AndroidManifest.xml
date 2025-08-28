@@ -28,6 +28,7 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="myapp"/>
         <data android:scheme="com.teczer.exponativewindtypescriptboilerplate"/>
+        <data android:scheme="exp+expo-nativewind-typescript-boilerplate"/>
       </intent-filter>
     </activity>
   </application>

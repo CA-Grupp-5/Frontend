@@ -3,9 +3,9 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-  "start": "expo start --dev-client",
-  "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-debug.ps1",
-  "release": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-release.ps1",
+    "start": "expo start --dev-client --host lan",
+    "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-debug.ps1",
+    "release": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-release.ps1",
     "android": "bun expo run:android",
     "android:prebuild": "npx expo prebuild && bun expo run:android",
     "ios": "bun expo run:ios",
@@ -23,6 +23,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
     "@react-navigation/native": "^7.1.6",
+    "@rnmapbox/maps": "^10.1.41",
     "expo": "^53.0.9",
     "expo-dev-client": "^5.2.4",
     "expo-font": "~13.3.1",
@@ -37,7 +38,7 @@
     "react-dom": "19.0.0",
     "react-native": "0.79.6",
     "react-native-mmkv": "^3.2.0",
-    "react-native-reanimated": "~3.17.4",
+    "react-native-reanimated": "3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.10.0",
     "react-native-web": "^0.20.0"
@@ -48,7 +49,6 @@
     "eslint": "^8.57.0",
     "eslint-config-expo": "~9.2.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-perfectionist": "^4.1.2",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^15.8.0",

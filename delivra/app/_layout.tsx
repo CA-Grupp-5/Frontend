@@ -6,6 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import 'react-native-reanimated';
+import Mapbox from '@rnmapbox/maps';
 
 import '../global.css';
 
@@ -38,6 +39,13 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [loaded]);
+
+  useEffect(() => {
+    // Initialize Mapbox once at app startup
+    if (!Mapbox.getAccessToken()) {
+      Mapbox.setAccessToken('pk.eyJ1IjoiaGVtcnlzIiwiYSI6ImNtYWQzdGh1cDA4OHQybXNib20xN295dGMifQ.y_6eA3k4vx7WFSV9PoHHTw');
+    }
+  }, []);
 
   if (!loaded) {
     return null;

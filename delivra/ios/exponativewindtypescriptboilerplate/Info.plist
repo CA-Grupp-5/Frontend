@@ -29,6 +29,7 @@
         <array>
           <string>myapp</string>
           <string>com.teczer.expo-nativewind-typescript-boilerplate</string>
+          <string>exp+expo-nativewind-typescript-boilerplate</string>
         </array>
       </dict>
     </array>

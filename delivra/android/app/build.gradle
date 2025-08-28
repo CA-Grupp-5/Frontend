@@ -4,6 +4,11 @@ apply plugin: "com.facebook.react"
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
+// Add Mapbox authentication configuration
+def getMapboxDownloadsToken() {
+    return project.findProperty("MAPBOX_DOWNLOADS_TOKEN") ?: ""
+}
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -86,6 +91,18 @@ android {
 
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
+
+    // Add Mapbox authentication
+    configurations.all {
+        resolutionStrategy.dependencySubstitution {
+            substitute module('com.mapbox.mapboxsdk:mapbox-android-gestures') using module('com.mapbox.common:common:23.3.2')
+        }
+    }
+
+    // Add exclusion rules for duplicate classes
+    configurations {
+        implementation.exclude group: 'com.mapbox.common', module: 'common'
+    }
 
     namespace 'com.teczer.exponativewindtypescriptboilerplate'
     defaultConfig {

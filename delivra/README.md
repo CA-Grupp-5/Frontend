@@ -1,4 +1,3 @@
-
 ### Features
 
 Developer experience first:
@@ -21,7 +20,6 @@ Developer experience first:
 - ⚛️ React Native 0.79 (Including New Arch, Android Edge-to-Edge...)
 - 💎 NativeWind 4.0
 - 🥟 Bun
-
 
 ### Requirements
 
@@ -53,5 +51,3 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ./delivra/scripts/build-andr
 ```
 
 To enable automatic signing for releases in CI, provide a keystore and the CI secret names; the release workflow can be configured to use those secrets.
-
-
