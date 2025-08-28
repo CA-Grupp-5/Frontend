@@ -122,6 +122,8 @@ android {
     }
     buildTypes {
         debug {
+            // Allow dev client to be installed alongside release by using a distinct app ID
+            applicationIdSuffix ".dev"
             signingConfig signingConfigs.debug
         }
         release {

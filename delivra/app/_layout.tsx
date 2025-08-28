@@ -42,9 +42,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     // Initialize Mapbox once at app startup
-    if (!Mapbox.getAccessToken()) {
-      Mapbox.setAccessToken('pk.eyJ1IjoiaGVtcnlzIiwiYSI6ImNtYWQzdGh1cDA4OHQybXNib20xN295dGMifQ.y_6eA3k4vx7WFSV9PoHHTw');
-    }
+    // @rnmapbox/maps exposes setAccessToken; getAccessToken is not available
+    Mapbox.setAccessToken('pk.eyJ1IjoiaGVtcnlzIiwiYSI6ImNtYWQzdGh1cDA4OHQybXNib20xN295dGMifQ.y_6eA3k4vx7WFSV9PoHHTw');
   }, []);
 
   if (!loaded) {
