@@ -66,6 +66,8 @@ $androidDir = $androidDir.Path
 Push-Location $androidDir
 try {
     Write-Host "Running Gradle wrapper: assembleDebug"
+    # Use community autolinking to avoid picking up expo-dev-menu mocks as RN modules
+    $env:EXPO_USE_COMMUNITY_AUTOLINKING = '1'
     & .\gradlew.bat clean assembleDebug --no-daemon
     if ($LASTEXITCODE -ne 0) { throw "Gradle build failed with exit code $LASTEXITCODE" }
 

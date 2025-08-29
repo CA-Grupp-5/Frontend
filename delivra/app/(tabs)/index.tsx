@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native';
 
-import { ExternalLink } from '@/components/ExternalLink';
+import { ExternalLink } from '../../components/ExternalLink';
 
 export default function TabOneScreen() {
   return (

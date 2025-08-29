@@ -92,17 +92,6 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    // Add Mapbox authentication
-    configurations.all {
-        resolutionStrategy.dependencySubstitution {
-            substitute module('com.mapbox.mapboxsdk:mapbox-android-gestures') using module('com.mapbox.common:common:23.3.2')
-        }
-    }
-
-    // Add exclusion rules for duplicate classes
-    configurations {
-        implementation.exclude group: 'com.mapbox.common', module: 'common'
-    }
 
     namespace 'com.teczer.exponativewindtypescriptboilerplate'
     defaultConfig {
@@ -122,7 +111,7 @@ android {
     }
     buildTypes {
         debug {
-            // Allow dev client to be installed alongside release by using a distinct app ID
+            // Allow dev APK to coexist with release
             applicationIdSuffix ".dev"
             signingConfig signingConfigs.debug
         }

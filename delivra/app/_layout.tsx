@@ -7,6 +7,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import 'react-native-reanimated';
 import Mapbox from '@rnmapbox/maps';
+import { LogBox } from 'react-native';
 
 import '../global.css';
 
@@ -44,6 +45,12 @@ export default function RootLayout() {
     // Initialize Mapbox once at app startup
     // @rnmapbox/maps exposes setAccessToken; getAccessToken is not available
     Mapbox.setAccessToken('pk.eyJ1IjoiaGVtcnlzIiwiYSI6ImNtYWQzdGh1cDA4OHQybXNib20xN295dGMifQ.y_6eA3k4vx7WFSV9PoHHTw');
+
+    // Silence noisy NativeEventEmitter warnings from third-party modules during dev
+    LogBox.ignoreLogs([
+      '`new NativeEventEmitter()` was called with a non-null argument without the required `addListener` method.',
+      '`new NativeEventEmitter()` was called with a non-null argument without the required `removeListeners` method.',
+    ]);
   }, []);
 
   if (!loaded) {
