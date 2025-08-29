@@ -22,7 +22,7 @@ export default function MapScreen() {
     <View style={{ flex: 1 }}>
       <Mapbox.MapView
           style={{ flex: 1 }}
-          styleURL={Mapbox.StyleURL.Street}
+          styleURL={Mapbox.StyleURL.Dark}
           attributionEnabled={true}
           logoEnabled={true}
           zoomEnabled={true}
