@@ -48,18 +48,20 @@ export default function TabLayout() {
           title: 'Home',
         }}
       />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="cog" color={color} />,
-          title: 'Settings',
-        }}
-      />
+      
       <Tabs.Screen
         name="map"
         options={{
           tabBarIcon: ({ color }) => <TabBarIcon name="map-o" color={color} />,
           title: 'Map',
+        }}
+      />
+
+      <Tabs.Screen
+        name="settings"
+        options={{
+          tabBarIcon: ({ color }) => <TabBarIcon name="cog" color={color} />,
+          title: 'Settings',
         }}
       />
     </Tabs>
