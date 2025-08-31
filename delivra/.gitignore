@@ -70,6 +70,10 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
+
+# Android local.properties should never be committed
+android/local.properties
 
 # typescript
 *.tsbuildinfo

@@ -6,7 +6,20 @@ def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
 
 // Add Mapbox authentication configuration
 def getMapboxDownloadsToken() {
-    return project.findProperty("MAPBOX_DOWNLOADS_TOKEN") ?: ""
+    // Resolve from gradle.properties/-P first, then android/local.properties, then env
+    def token = project.findProperty("MAPBOX_DOWNLOADS_TOKEN")
+    if (!token) {
+        def lp = new Properties()
+        def lpFile = rootProject.file("local.properties")
+        if (lpFile.exists()) {
+            lpFile.withInputStream { lp.load(it) }
+            token = lp.getProperty("MAPBOX_DOWNLOADS_TOKEN")
+        }
+    }
+    if (!token) {
+        token = System.getenv("MAPBOX_DOWNLOADS_TOKEN")
+    }
+    return token ?: ""
 }
 
 /**

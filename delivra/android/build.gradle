@@ -20,6 +20,21 @@ def reactNativeAndroidDir = new File(
   "../android"
 )
 
+// Resolve Mapbox downloads token from multiple safe sources (no secrets in VCS)
+def mapboxDownloadsToken = providers.gradleProperty("MAPBOX_DOWNLOADS_TOKEN").orNull
+if (!mapboxDownloadsToken) {
+  def lp = new Properties()
+  def lpFile = rootProject.file("local.properties")
+  if (lpFile.exists()) {
+    lpFile.withInputStream { lp.load(it) }
+    mapboxDownloadsToken = lp.getProperty("MAPBOX_DOWNLOADS_TOKEN")
+  }
+}
+if (!mapboxDownloadsToken) {
+  mapboxDownloadsToken = System.getenv("MAPBOX_DOWNLOADS_TOKEN")
+}
+mapboxDownloadsToken = mapboxDownloadsToken ?: ""
+
 allprojects {
   repositories {
     maven {
@@ -37,7 +52,7 @@ allprojects {
         }
         credentials {
             username = "mapbox"
-            password = project.findProperty("MAPBOX_DOWNLOADS_TOKEN") ?: ""
+            password = mapboxDownloadsToken
         }
     }
   }

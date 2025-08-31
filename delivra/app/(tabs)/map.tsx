@@ -1,6 +1,7 @@
 import React, { useRef, useCallback } from 'react';
 import { View } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MapScreen() {
   const cameraRef = useRef<Mapbox.Camera>(null);
@@ -19,7 +20,8 @@ export default function MapScreen() {
   }, []);
 
   return (
-    <View style={{ flex: 1 }}>
+    
+    <SafeAreaView style={{ flex: 1 }}>
       <Mapbox.MapView
           style={{ flex: 1 }}
           styleURL={Mapbox.StyleURL.Dark}
@@ -45,6 +47,6 @@ export default function MapScreen() {
         >
           <Mapbox.Camera ref={cameraRef} />
         </Mapbox.MapView>
-    </View>
+    </SafeAreaView>
   );
 }

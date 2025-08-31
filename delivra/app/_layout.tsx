@@ -7,6 +7,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import 'react-native-reanimated';
 import Mapbox from '@rnmapbox/maps';
+import Constants from 'expo-constants';
 import { LogBox } from 'react-native';
 
 import '../global.css';
@@ -42,9 +43,9 @@ export default function RootLayout() {
   }, [loaded]);
 
   useEffect(() => {
-    // Initialize Mapbox once at app startup
-    // @rnmapbox/maps exposes setAccessToken; getAccessToken is not available
-    Mapbox.setAccessToken('pk.eyJ1IjoiaGVtcnlzIiwiYSI6ImNtYWQzdGh1cDA4OHQybXNib20xN295dGMifQ.y_6eA3k4vx7WFSV9PoHHTw');
+    // Initialize Mapbox once at app startup using a non-committed env/config value
+    const token = (Constants?.expoConfig?.extra as any)?.MAPBOX_ACCESS_TOKEN as string | undefined;
+    Mapbox.setAccessToken(token ?? '');
 
     // Silence noisy NativeEventEmitter warnings from third-party modules during dev
     LogBox.ignoreLogs([
