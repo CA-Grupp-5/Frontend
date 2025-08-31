@@ -1,19 +1,34 @@
-const tintColorLight = '#2f95dc';
-const tintColorDark = '#fff';
+const tintColor = 'hsl(200, 90%, 55%)'; // Approximate of oklch(0.65 0.15 195)
 
-export default {
-  dark: {
-    background: '#000',
-    tabIconDefault: '#ccc',
-    tabIconSelected: tintColorDark,
-    text: '#fff',
-    tint: tintColorDark,
-  },
+export type ThemeName = 'light' | 'dark';
+
+const Colors: Record<ThemeName, {
+  text: string;
+  background: string;
+  tint: string;
+  tabIconDefault: string;
+  tabIconSelected: string;
+  tabBarBackground: string;
+  tabBarBorder: string;
+}> = {
   light: {
-    background: '#fff',
-    tabIconDefault: '#ccc',
-    tabIconSelected: tintColorLight,
-    text: '#000',
-    tint: tintColorLight,
+    text: '#111827',
+    background: '#ffffff',
+    tint: tintColor,
+    tabIconDefault: '#9ca3af',
+    tabIconSelected: tintColor,
+    tabBarBackground: '#ffffff',
+    tabBarBorder: '#e5e7eb',
+  },
+  dark: {
+    text: '#f9fafb',
+    background: '#000000',
+    tint: tintColor,
+    tabIconDefault: '#6b7280',
+    tabIconSelected: tintColor,
+    tabBarBackground: '#0b1220',
+    tabBarBorder: '#0f172a',
   },
 };
+
+export default Colors;
