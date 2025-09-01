@@ -1,29 +1,47 @@
 import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import Colors from '@/constants/Colors';
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: { name: React.ComponentProps<typeof FontAwesome>['name']; color: string }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+// Render a white icon on top of a tinted circular background when focused
+function CircleTabIcon({ name, focused, tint, inactive }: { name: React.ComponentProps<typeof FontAwesome>['name']; focused: boolean; tint: string; inactive: string }) {
+  if (focused) {
+    return (
+      <View style={{ alignItems: 'center', justifyContent: 'center', transform: [{ translateY: -10 }] }}>
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: tint,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <FontAwesome name={name} size={20} color={'hsl(0, 0%, 100%)'} />
+        </View>
+        
+      </View>
+    );
+  }
+  return <FontAwesome name={name} size={22} color={inactive} />;
 }
 
 export default function TabLayout() {
   const { colorScheme } = useColorScheme();
+  const scheme = colorScheme ?? 'light';
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
+        tabBarActiveTintColor: Colors[scheme].tint,
+        tabBarInactiveTintColor: Colors[scheme].tabIconDefault,
         tabBarStyle: {
-          backgroundColor: Colors[colorScheme ?? 'light'].tabBarBackground,
-          borderTopColor: Colors[colorScheme ?? 'light'].tabBarBorder,
+          backgroundColor: Colors[scheme].tabBarBackground,
+          borderTopColor: Colors[scheme].tabBarBorder,
         },
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
         headerShown: false,
       }}
     >
@@ -37,14 +55,16 @@ export default function TabLayout() {
                   <FontAwesome
                     name="info-circle"
                     size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
+                    color={Colors[scheme].text}
                     style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
                   />
                 )}
               </Pressable>
             </Link>
           ),
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: ({ focused, color }) => (
+            <CircleTabIcon name="home" focused={focused} tint={Colors[scheme].tint} inactive={Colors[scheme].tabIconDefault} />
+          ),
           title: 'Home',
         }}
       />
@@ -52,7 +72,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="map"
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="map-o" color={color} />,
+          tabBarIcon: ({ focused, color }) => (
+            <CircleTabIcon name="map-o" focused={focused} tint={Colors[scheme].tint} inactive={Colors[scheme].tabIconDefault} />
+          ),
           title: 'Map',
         }}
       />
@@ -60,7 +82,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="cog" color={color} />,
+          tabBarIcon: ({ focused, color }) => (
+            <CircleTabIcon name="cog" focused={focused} tint={Colors[scheme].tint} inactive={Colors[scheme].tabIconDefault} />
+          ),
           title: 'Settings',
         }}
       />
