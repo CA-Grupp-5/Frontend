@@ -4,9 +4,9 @@ import Mapbox from '@rnmapbox/maps';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
-import Colors from '@/constants/Colors';
 import { LinearGradient } from 'expo-linear-gradient';
 import DriverSheet from '@/components/DriverSheet';
+import Colors, { Palette } from '@/constants/Colors';
 
 export default function MapScreen() {
   const cameraRef = useRef<Mapbox.Camera>(null);
@@ -81,7 +81,7 @@ export default function MapScreen() {
                   shadowOffset: { width: 0, height: 2 },
                 }}
               > */}
-                <FontAwesome name="truck" size={40} color="#1590a6" style={{ transform: [{ rotate: '0deg' }] }} />
+<FontAwesome name="truck" size={40} color={Palette.markerTruck} style={{ transform: [{ rotate: '0deg' }] }} />
               {/* </LinearGradient> */}
             </Pressable>
           </Mapbox.MarkerView>

@@ -1,6 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 
+import { Palette } from '@/constants/Colors';
 import { capitalizeFirstLetter } from '@/lib/utils';
 
 interface Props {
@@ -12,7 +13,7 @@ interface Props {
 export default function ToggleTheme({ colorScheme, setColorScheme, theme }: Props) {
   const shadowBox = {
     elevation: 10,
-    shadowColor: '#000',
+    shadowColor: Palette.black,
     shadowOffset: {
       height: 5,
       width: 0,
@@ -25,7 +26,7 @@ export default function ToggleTheme({ colorScheme, setColorScheme, theme }: Prop
     <Pressable
       style={{
         alignItems: 'center',
-        backgroundColor: colorScheme === 'light' ? 'white' : '#333', // Replace dark:bg-neutral-900
+backgroundColor: colorScheme === 'light' ? Palette.white : Palette.neutral800, // Replace dark:bg-neutral-900
         flexDirection: 'row',
         height: 56, // Equivalent to h-14
         justifyContent: 'space-between',
@@ -44,14 +45,14 @@ export default function ToggleTheme({ colorScheme, setColorScheme, theme }: Prop
         <MaterialIcons
           name={theme === 'dark' ? 'dark-mode' : 'light-mode'}
           size={20}
-          color={colorScheme === 'dark' ? 'white' : 'black'}
+color={colorScheme === 'dark' ? Palette.white : Palette.black}
         />
         <Text className="text-xl italic text-black dark:text-white">{capitalizeFirstLetter(theme)}</Text>
       </View>
       <View
         style={{
           alignItems: 'center',
-          borderColor: colorScheme === 'light' ? 'black' : 'white',
+borderColor: colorScheme === 'light' ? Palette.black : Palette.white,
           borderRadius: 12,
           borderWidth: 2,
           height: 24,
@@ -62,7 +63,7 @@ export default function ToggleTheme({ colorScheme, setColorScheme, theme }: Prop
         {colorScheme === theme && (
           <View
             style={{
-              backgroundColor: colorScheme === 'light' ? 'black' : 'white',
+backgroundColor: colorScheme === 'light' ? Palette.black : Palette.white,
               borderRadius: 6,
               height: 10,
               width: 10,
