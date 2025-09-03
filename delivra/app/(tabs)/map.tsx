@@ -117,6 +117,7 @@ export default function MapScreen() {
           <Mapbox.Camera ref={cameraRef} />
 
           {/* Render route line if present */}
+          {/* play around a bit with line color, width and opacity for a pro look */}
           {routeFeature && (
             <Mapbox.ShapeSource id="routeSource" shape={routeFeature as any}>
               <Mapbox.LineLayer
@@ -126,14 +127,14 @@ export default function MapScreen() {
                   lineWidth: 4,
                   lineOpacity: 0.9,
                   lineCap: 'round',
-                  lineJoin: 'round',
-                  lineDasharray: [2, 2],
+                  lineJoin: 'round'
+                  
                 }}
               />
             </Mapbox.ShapeSource>
           )}
 
-          {/* Truck marker: tinted circle with white icon */}
+          {/* Truck marker */}
           <Mapbox.MarkerView coordinate={ORIGIN} anchor={{ x: 0.5, y: 0.5 }}>
             <Pressable onPress={() => setSheetVisible(true)}>
               <View
@@ -152,6 +153,7 @@ export default function MapScreen() {
           </Mapbox.MarkerView>
 
           {/* Home marker (destination) */}
+          {/* could add tip indicator and elevate */}
           <Mapbox.MarkerView coordinate={home} anchor={{ x: 0.5, y: 1 }}>
             <View style={{ alignItems: 'center' }}>
               <View
