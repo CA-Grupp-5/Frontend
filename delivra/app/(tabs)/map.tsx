@@ -4,7 +4,6 @@ import Mapbox from '@rnmapbox/maps';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
-import { LinearGradient } from 'expo-linear-gradient';
 import DriverSheet from '@/components/DriverSheet';
 import Colors, { Palette } from '@/constants/Colors';
 import Constants from 'expo-constants';
