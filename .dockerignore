@@ -1,0 +1,34 @@
+# Ignore typical local and build artifacts
+node_modules
+.yarn/*
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/patches
+
+# Android
+android/.gradle
+android/build
+android/app/build
+
+# iOS
+ios/Pods
+ios/build
+
+# Expo/Metro caches
+.expo
+.expo-shared
+.expo/*
+
+# VCS
+.git
+.gitignore
+
+# Misc
+*.log
+.tmp
+.tmp/**
+tmp
+.temp
+.DS_Store
+

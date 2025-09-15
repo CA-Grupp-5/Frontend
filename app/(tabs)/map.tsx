@@ -171,7 +171,6 @@ export default function MapScreen() {
           </Mapbox.MarkerView>
 
         </Mapbox.MapView>
-      <DriverSheet visible={sheetVisible} onClose={() => setSheetVisible(false)} driver={driver} />
-    </SafeAreaView>
+      <DriverSheet visible={sheetVisible} onClose={() => setSheetVisible(false)} driver={driver} />    </SafeAreaView>
   );
 }

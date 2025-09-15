@@ -71,6 +71,7 @@ yarn-error.*
 # local env files
 .env*.local
 .env
+.secrets
 
 # Android local.properties should never be committed
 android/local.properties

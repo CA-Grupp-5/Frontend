@@ -1,0 +1,139 @@
+name: Android CI (Docker)
+
+on:
+  push:
+    branches: [ main, docker-test-plus-actions ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Android builder image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/android.Dockerfile
+          tags: rn-android-builder:latest
+          load: true
+          # !!!uncomment these two when pushing to github
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
+
+      # Use a conditional step for act (local) to ensure volume mount uses a host path
+      - name: Build debug APK in container (act)
+        if: env.ACT == 'true'
+        env:
+          MAPBOX_DOWNLOADS_TOKEN: ${{ secrets.MAPBOX_DOWNLOADS_TOKEN }}
+          EXPO_USE_COMMUNITY_AUTOLINKING: '1'
+          ACT_WORKSPACE_HOST: ${{ secrets.ACT_WORKSPACE_HOST }}
+          EXPO_USE_COMMUNITY_AUTOLINKING: '1'
+        run: |
+          docker run --rm -v "${{ env.ACT_WORKSPACE_HOST }}:/workspace" \
+            -e MAPBOX_DOWNLOADS_TOKEN="$MAPBOX_DOWNLOADS_TOKEN" \
+            rn-android-builder:latest \
+            bash -lc '
+              set -euo pipefail
+              cd /workspace
+              echo "Node: $(node --version)"
+              java -version
+              if [ -f bun.lock ]; then echo "using bun"; bun install --no-save;
+              elif [ -f package-lock.json ]; then echo "using npm ci"; npm ci;
+              elif [ -f yarn.lock ]; then echo "using yarn"; corepack enable && yarn install --immutable;
+              elif [ -f pnpm-lock.yaml ]; then echo "using pnpm"; corepack enable && pnpm install --frozen-lockfile;
+              else echo "no lockfile found, falling back to npm install"; npm install; fi
+              cd android
+              chmod +x gradlew || true
+              sed -i 's/\r$//' gradlew || true
+              # Override AGP version at build time without touching repo files
+              # Force both plugins DSL and legacy buildscript classpath to AGP 8.6.1
+              printf "%s\n" \
+                "gradle.settingsEvaluated { settings ->" \
+                "  settings.pluginManagement.resolutionStrategy.eachPlugin {" \
+                "    if (requested.id.id == \"com.android.application\" || requested.id.id == \"com.android.library\") {" \
+                "      useVersion(\"8.6.1\")" \
+                "    }" \
+                "  }" \
+                "}" \
+                "" \
+                "gradle.beforeProject { p ->" \
+                "  if (p.buildscript != null) {" \
+                "    p.buildscript.configurations.matching { it.name == 'classpath' }.all { cfg ->" \
+                "      cfg.resolutionStrategy.eachDependency { det ->" \
+                "        if (det.requested.group == 'com.android.tools.build' && det.requested.name == 'gradle') {" \
+                "          det.useVersion('8.6.1')" \
+                "          det.because('Force AGP 8.6.1 for CI compatibility')" \
+                "        }" \
+                "      }" \
+                "    }" \
+                "  }" \
+                "}" > /tmp/agp-override.init.gradle
+              ./gradlew -I /tmp/agp-override.init.gradle --no-daemon --stacktrace assembleDebug
+            '
+
+      - name: Build debug APK in container
+        if: env.ACT != 'true'
+        env:
+          MAPBOX_DOWNLOADS_TOKEN: ${{ secrets.MAPBOX_DOWNLOADS_TOKEN }}
+        run: |
+          docker run --rm -v ${{ github.workspace }}:/workspace \
+            -v ~/.gradle:/root/.gradle \
+            -e MAPBOX_DOWNLOADS_TOKEN="$MAPBOX_DOWNLOADS_TOKEN" \
+            rn-android-builder:latest \
+            bash -lc 'set -euo pipefail
+              cd /workspace
+              echo "Node: $(node --version)"
+              java -version
+              if [ -f bun.lock ]; then echo "using bun"; bun install --no-save;
+              elif [ -f package-lock.json ]; then echo "using npm ci"; npm ci;
+              elif [ -f yarn.lock ]; then echo "using yarn"; corepack enable && yarn install --immutable;
+              elif [ -f pnpm-lock.yaml ]; then echo "using pnpm"; corepack enable && pnpm install --frozen-lockfile;
+              else echo "no lockfile found, falling back to npm install"; npm install; fi
+              cd android
+              chmod +x gradlew || true
+              sed -i 's/\r$//' gradlew || true
+              # Override AGP version at build time without touching repo files
+              # Force both plugins DSL and legacy buildscript classpath to AGP 8.6.1
+              printf "%s\n" \
+                "gradle.settingsEvaluated { settings ->" \
+                "  settings.pluginManagement.resolutionStrategy.eachPlugin {" \
+                "    if (requested.id.id == \"com.android.application\" || requested.id.id == \"com.android.library\") {" \
+                "      useVersion(\"8.6.1\")" \
+                "    }" \
+                "  }" \
+                "}" \
+                "" \
+                "gradle.beforeProject { p ->" \
+                "  if (p.buildscript != null) {" \
+                "    p.buildscript.configurations.matching { it.name == 'classpath' }.all { cfg ->" \
+                "      cfg.resolutionStrategy.eachDependency { det ->" \
+                "        if (det.requested.group == 'com.android.tools.build' && det.requested.name == 'gradle') {" \
+                "          det.useVersion('8.6.1')" \
+                "          det.because('Force AGP 8.6.1 for CI compatibility')" \
+                "        }" \
+                "      }" \
+                "    }" \
+                "  }" \
+                "}" > /tmp/agp-override.init.gradle
+              ./gradlew -I /tmp/agp-override.init.gradle --no-daemon --stacktrace assembleDebug'
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-apk
+          path: |
+            android/app/build/outputs/**/*.apk
+          if-no-files-found: error
+          retention-days: 7
+
