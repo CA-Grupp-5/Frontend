@@ -19,6 +19,7 @@ export default function MapScreen() {
   // Origin (truck) coordinate (lon, lat)
   const ORIGIN: [number, number] = [18.0686, 59.3293];
   // Destination: default on-land point in Stockholm (Tele2 Arena vicinity)
+  // !MIGHT BE WHY BUILD WILL OCCASIONALLY SHOW PATH DOWN TO A WRONG HOME, CHECK TIMING OR REMOVE DEFAULT HERE
   // You can override this by setting HOME_ADDRESS below.
   const [home, setHome] = React.useState<[number, number]>([18.0911, 59.2934]);
   // Set this to any address you want (e.g., 'Arenaslingan 14, Johanneshov, Stockholm').

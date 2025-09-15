@@ -1,39 +1,53 @@
-# Frontend
+### Features
 
-This is the main frontend repository for the project.
+Developer experience first:
 
-## Tech Stack & Workflow
+- ⚡ [Expo](https://expo.dev) for mobile development
+- ⚛️ [React Native](https://reactnative.dev) for building native apps using React
+- 🔥 Type checking [TypeScript](https://www.typescriptlang.org)
+- 💎 Integrate with [NativeWind](https://www.nativewind.dev), Tailwind CSS for React Native
+- 🌜 Light/Dark mode already setup with toggle
+- 📊 MMKV (~30x faster than AsyncStorage and not Async usage)
+- 📁 File-based routing with Expo Router
+- 📏 Linter with [ESLint](https://eslint.org)
+- 💖 Code Formatter with [Prettier](https://prettier.io)
+- 🤡 Unit Testing with Jest
+- 💡 Absolute Imports using `@` prefix
 
-- **State Management:** [Zustand](https://github.com/pmndrs/zustand) for context and state management.
-- **Expo SDK:** Using Expo 53 and EAS workflow (free tier) initially. Will migrate to GitHub Actions and Fastlane for CI/CD.
-- **Styling:** [NativeWind](https://www.nativewind.dev/) (Tailwind CSS for React Native). Fallback to StyleSheet only when needed.
-- **Local Storage:** [MMKV](https://github.com/mrousavy/react-native-mmkv) for fast local storage.
-- **Maps:** [Mapbox](https://docs.mapbox.com/) for map components, with builds tailored for Expo.
-- **Development Builds:** Using Expo development builds early, as required features need custom native code.
-- **Boilerplate:** Initial setup uses a fast Expo app template from npm. Some GitHub Actions adapted from the [obites repo](https://github.com/obites).
-- **Testing:** [Jest](https://jestjs.io/) for unit testing. [Codecov](https://about.codecov.io/) enabled for pull request reviews.
-- **Code Review:** Every pull request requires both automated and secondary human review/testing.
+### Last Boilerplate Update
 
-## Getting Started
+- ⚡ Expo SDK 53 (Including Expo Router 3.5, Expo UI...) + update all libraries
+- ⚛️ React Native 0.79 (Including New Arch, Android Edge-to-Edge...)
+- 💎 NativeWind 4.0
+- 🥟 Bun
 
-1. **Clone the repo:**
-   ```sh
-   git clone <repo-url>
-   cd Frontend
-   ```
+### Requirements
 
-2. **Install dependencies (using Bun):**
-   ```sh
-   bun install
-   ```
+- Node.js 22+ (Recommended LTS)
+- BUN IS VERY RECOMMENDED
 
-3. **Start the development server:**
-   ```sh
-   bunx expo start
-   ```
+### Dev build shortcuts
 
-## Contributing
+Two convenience scripts are available to run CI-style builds with Bun:
 
-- Ensure all tests pass before submitting a PR.
-- PRs require both automated checks and manual review.
-- Follow the established code style and conventions.
+- Debug/dev APK (includes expo dev client):
+
+```powershell
+# from repo root
+bun run dev
+```
+
+- Release APK (runs a release Gradle build):
+
+```powershell
+# from repo root
+bun run release
+```
+
+Both commands execute the PowerShell scripts in `./scripts`, perform `bun install` when Bun is available, and invoke the Gradle wrapper. If PowerShell execution is blocked by policy, run the script with an explicit bypass:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ./delivra/scripts/build-android-debug.ps1
+```
+
+To enable automatic signing for releases in CI, provide a keystore and the CI secret names; the release workflow can be configured to use those secrets.
