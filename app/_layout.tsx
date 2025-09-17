@@ -11,6 +11,8 @@ import Constants from 'expo-constants';
 import { LogBox } from 'react-native';
 
 import '../global.css';
+import { useAuthStore } from '@/stores/authStore';
+import LoginScreen from '@/components/LoginScreen';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -63,7 +65,18 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const { colorScheme } = useColorScheme();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <LoginScreen />
+      </ThemeProvider>
+    );
+  }
+
+  // Show protected app content if authenticated
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
