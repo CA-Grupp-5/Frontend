@@ -7,6 +7,10 @@
     "s": "expo start --dev-client --host lan",
     "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-debug.ps1",
     "release": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-release.ps1",
+    "build:android:release": "dos2unix android/gradlew && chmod +x android/gradlew && cd android && ./gradlew clean assembleRelease --no-daemon",
+    "build:apk": "bun run build:android:release",
+    "build:android:debug": "dos2unix android/gradlew && chmod +x android/gradlew && cd android && EXPO_USE_COMMUNITY_AUTOLINKING=1 ./gradlew clean assembleDebug --no-daemon",
+    "build:apk:dev": "bun run build:android:debug",
     "android": "bun expo run:android",
     "android:prebuild": "npx expo prebuild && bun expo run:android",
     "ios": "bun expo run:ios",
@@ -51,6 +55,7 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "@types/react": "~19.0.10",
+    "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
     "eslint-config-expo": "~9.2.0",
     "eslint-config-prettier": "^9.1.0",

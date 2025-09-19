@@ -69,32 +69,26 @@ jobs:
       - name: 📦 Install dependencies
         run: |
           bun install
-          bun add -g eas-cli@latest
 
-      - name: 📱 Setup EAS build cache
+      - name: 🐘 Setup Gradle cache
         uses: actions/cache@v3
         with:
-          path: ~/.eas-build-local
-          key: ${{ runner.os }}-eas-build-local-${{ hashFiles('**/package.json') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-eas-build-local-
-
-      - name: 🔄 Verify EAS CLI installation
-        run: |
-          echo "EAS CLI version:"
-          eas --version
+            ${{ runner.os }}-gradle-
 
       - name:  Build Development APK
         if: github.event.inputs.buildType == 'all' || github.event.inputs.buildType == 'dev' || github.event_name == 'push'
-        run: |
-          eas build --platform android --profile development --local --non-interactive --output=./app-dev.apk
+        run: bun run build:apk:dev
         env:
           NODE_ENV: development
 
       - name: 📱 Build Production APK
         if: github.event.inputs.buildType == 'all' || github.event.inputs.buildType == 'prod-apk' || github.event_name == 'push'
-        run: |
-          eas build --platform android --profile production-apk --local --non-interactive --output=./app-prod.apk
+        run: bun run build:apk
         env:
           NODE_ENV: production
 
@@ -103,8 +97,8 @@ jobs:
         with:
           name: app-builds
           path: |
-            ./app-dev.apk
-            ./app-prod.apk
+            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/apk/release/*.apk
           # Don't fail the workflow if an APK is not found (e.g., if only one build type was run)
           if-no-files-found: warn
           retention-days: 7
