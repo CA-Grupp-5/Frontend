@@ -70,7 +70,10 @@ jobs:
         run: |
           bun install
 
-      - name: 🐘 Setup Gradle cache
+      - name: �️ Install build utilities
+        run: sudo apt-get update && sudo apt-get install -y dos2unix
+
+      - name: �🐘 Setup Gradle cache
         uses: actions/cache@v3
         with:
           path: |
