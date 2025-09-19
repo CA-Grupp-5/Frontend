@@ -37,15 +37,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       backgroundColor: '#ffffff',
     },
     ios: {
-      supportsTablet: true,
+      ...config.ios,
       bundleIdentifier: iosBundleIdentifier,
     },
     android: {
-      edgeToEdgeEnabled: true,
-      adaptiveIcon: {
-        foregroundImage: './assets/images/adaptive-icon.png',
-        backgroundColor: '#ffffff',
-      },
+      ...config.android,
       package: androidPackage,
     },
     web: {
