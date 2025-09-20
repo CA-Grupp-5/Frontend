@@ -20,23 +20,25 @@ def reactNativeAndroidDir = new File(
   "../android"
 )
 
-// Resolve Mapbox downloads token from multiple safe sources (no secrets in VCS)
-def mapboxDownloadsToken = providers.gradleProperty("MAPBOX_DOWNLOADS_TOKEN").orNull
+def mapboxDownloadsToken = (providers.gradleProperty('MAPBOX_DOWNLOADS_TOKEN').orNull ?: System.getenv('MAPBOX_DOWNLOADS_TOKEN'))?.trim()
 if (!mapboxDownloadsToken) {
-  def lp = new Properties()
-  def lpFile = rootProject.file("local.properties")
-  if (lpFile.exists()) {
-    lpFile.withInputStream { lp.load(it) }
-    mapboxDownloadsToken = lp.getProperty("MAPBOX_DOWNLOADS_TOKEN")
-  }
+  throw new GradleException('MAPBOX_DOWNLOADS_TOKEN is required to download Mapbox native artifacts. Set it in android/gradle.properties or export MAPBOX_DOWNLOADS_TOKEN before building.')
 }
-if (!mapboxDownloadsToken) {
-  mapboxDownloadsToken = System.getenv("MAPBOX_DOWNLOADS_TOKEN")
-}
-mapboxDownloadsToken = mapboxDownloadsToken ?: ""
 
 allprojects {
   repositories {
+    maven {
+      url 'https://api.mapbox.com/downloads/v2/releases/maven'
+      authentication {
+        basic(BasicAuthentication)
+      }
+      credentials {
+        // Do not change the username below. It should always be "mapbox"
+        username = "mapbox"
+        // Use the secret token you stored in gradle.properties as the password
+        password = mapboxDownloadsToken
+      }
+    }
     maven {
       // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
       url(reactNativeAndroidDir)
@@ -45,18 +47,11 @@ allprojects {
     google()
     mavenCentral()
     maven { url 'https://www.jitpack.io' }
-    maven {
-        url 'https://api.mapbox.com/downloads/v2/releases/maven'
-        authentication {
-            basic(BasicAuthentication)
-        }
-        credentials {
-            username = "mapbox"
-            password = mapboxDownloadsToken
-        }
-    }
   }
 }
 
 apply plugin: "expo-root-project"
 apply plugin: "com.facebook.react.rootproject"
+
+
+

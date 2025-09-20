@@ -1,5 +1,13 @@
 import 'dotenv/config';
 
+const enableDevClient = process.env.EXPO_DEV_CLIENT === 'true';
+
+const expoPlugins = ['expo-router', 'expo-font', 'expo-web-browser', 'expo-secure-store', 'expo-asset'];
+
+if (enableDevClient) {
+  expoPlugins.push('expo-dev-client');
+}
+
 export default {
   expo: {
     name: 'expo-nativewind-typescript-boilerplate',
@@ -9,6 +17,7 @@ export default {
     icon: './assets/images/icon.png',
     scheme: 'myapp',
     userInterfaceStyle: 'automatic',
+    newArchEnabled: false,
     splash: {
       image: './assets/images/splash.png',
       resizeMode: 'contain',
@@ -31,7 +40,7 @@ export default {
       output: 'static',
       favicon: './assets/images/favicon.png',
     },
-    plugins: ['expo-router', 'expo-font', 'expo-web-browser', 'expo-dev-client'],
+    plugins: expoPlugins,
     experiments: {
       typedRoutes: true,
       tsconfigPaths: true,
@@ -42,4 +51,6 @@ export default {
     },
   },
 };
+
+
 

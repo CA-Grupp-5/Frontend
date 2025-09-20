@@ -10,9 +10,10 @@ module.exports = {
   },
   dependencies: {
     'react-native-gesture-handler': {
-      // Keep RNGH disabled – Mapbox gestures don't require it
+      // Keep RNGH disabled; Mapbox gestures do not require it
       platforms: { android: null, ios: null },
     },
   },
 };
+
 
