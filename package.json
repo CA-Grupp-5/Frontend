@@ -3,8 +3,10 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "start": "node ./scripts/start-expo.cjs",
-    "s": "node ./scripts/start-expo.cjs",
+    "start2": "node ./scripts/start-expo.cjs",
+    "s": "bun expo start --dev-client --host lan",
+    "start": "bun expo start --dev-client --host lan",
+    "sc": "node ./scripts/start-expo.cjs",
     "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-debug.ps1",
     "release": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-release.ps1",
     "android": "bun expo run:android",

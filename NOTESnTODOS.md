@@ -1,4 +1,5 @@
-REBUILD DEBUG APK  
+--using default dev client command use backup script if wifi acts up
+
  
  
  REFACTOR LOGIN UI ,EXPORT STYLES , ADD SUBTLE DOT ANIMATION
