@@ -51,6 +51,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
+    "@react-native-community/cli": "^13.6.8",
     "@types/react": "~19.0.10",
     "eslint": "^8.57.0",
     "eslint-config-expo": "~9.2.0",
