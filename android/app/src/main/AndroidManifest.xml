@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.teczer.exponativewindtypescriptboilerplate">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.delivra">
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
@@ -24,9 +24,10 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="myapp"/>
-        <data android:scheme="exp+expo-nativewind-typescript-boilerplate"/>
+        <data android:scheme="delivra"/>
+        <data android:scheme="exp+delivra"/>
       </intent-filter>
     </activity>
   </application>
 </manifest>
+

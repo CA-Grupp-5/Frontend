@@ -45,9 +45,9 @@ export default function MapScreen() {
   const [sheetVisible, setSheetVisible] = React.useState(false);
 
   const ORIGIN: Coordinate = [18.0686, 59.3293];
-  const INITIAL_DESTINATION: Coordinate = [18.0911, 59.2934];
-  const [home, setHome] = React.useState<Coordinate>(INITIAL_DESTINATION);
+  // const INITIAL_DESTINATION: Coordinate = [18.0911, 59.2934];
   const HOME_ADDRESS = 'Sveavagen 168, 113 46 Stockholm, Sweden' as const;
+  const [home, setHome] = React.useState<Coordinate | null>(null);
 
   const [routeGeom, setRouteGeom] = React.useState<any | null>(null);
   const [eta, setEta] = React.useState<string>('');
@@ -64,7 +64,7 @@ export default function MapScreen() {
     [eta]
   );
 
-  const initialBounds = useMemo(() => computeBoundsBetween(ORIGIN, INITIAL_DESTINATION), []);
+  const defaultBounds = useMemo(() => computeBoundsBetween(ORIGIN, ORIGIN), []);
 
   const fitBounds = useCallback((bounds: { ne: Coordinate; sw: Coordinate }, duration: number) => {
     requestAnimationFrame(() => {
@@ -83,6 +83,7 @@ export default function MapScreen() {
 
   const fitEndpoints = useCallback(
     (duration = 0) => {
+      if (!home) return;
       fitBounds(computeBoundsBetween(ORIGIN, home), duration);
     },
     [home, fitBounds]
@@ -104,7 +105,7 @@ export default function MapScreen() {
   }, []);
 
   useEffect(() => {
-    if (!mapReady) return;
+    if (!mapReady || !home) return;
     fitEndpoints(0);
     routeBoundsAppliedRef.current = false;
   }, [home, mapReady, fitEndpoints]);
@@ -176,7 +177,7 @@ export default function MapScreen() {
           ref={cameraRef}
           defaultSettings={{
             bounds: {
-              ...initialBounds,
+              ...defaultBounds,
               paddingLeft: BOUNDS_PADDING,
               paddingRight: BOUNDS_PADDING,
               paddingTop: BOUNDS_PADDING,
@@ -217,25 +218,31 @@ export default function MapScreen() {
           </Pressable>
         </Mapbox.MarkerView>
 
-        <Mapbox.MarkerView coordinate={home} anchor={{ x: 0.5, y: 1 }}>
-          <View style={{ alignItems: 'center' }}>
-            <View
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 22,
-                backgroundColor: tint,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <FontAwesome name="home" size={22} color={'hsl(0, 0%, 100%)'} />
+        {home && (
+          <Mapbox.MarkerView coordinate={home} anchor={{ x: 0.5, y: 1 }}>
+            <View style={{ alignItems: 'center' }}>
+              <View
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 22,
+                  backgroundColor: tint,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <FontAwesome name="home" size={22} color={'hsl(0, 0%, 100%)'} />
+              </View>
             </View>
-          </View>
-        </Mapbox.MarkerView>
+          </Mapbox.MarkerView>
+        )}
       </Mapbox.MapView>
 
       <DriverSheet visible={sheetVisible} onClose={() => setSheetVisible(false)} driver={driver} />
     </SafeAreaView>
   );
 }
+
+
+
+

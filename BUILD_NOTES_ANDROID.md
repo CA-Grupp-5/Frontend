@@ -7,7 +7,7 @@ This document captures the settings that allow `assembleRelease` to succeed afte
 - `app.config.ts`
   - `newArchEnabled: false` to keep the classic architecture; `gradlew clean` can revert to defaults if this flag is removed.
   - Plugin list built from `expoPlugins`; `expo-dev-client` only added when `EXPO_DEV_CLIENT=true`.
-  - Expo `android.package`: `com.teczer.exponativewindtypescriptboilerplate`.
+  - Expo `android.package`: `com.delivra`.
 
 ## Dependency Versions
 
@@ -100,3 +100,4 @@ cd android
 ```
 
 Make sure `MAPBOX_DOWNLOADS_TOKEN` is present via `android/gradle.properties` or the environment before running the release build.
+

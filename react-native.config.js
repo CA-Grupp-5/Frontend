@@ -2,7 +2,7 @@ module.exports = {
   project: {
     android: {
       sourceDir: './android',
-      packageName: 'com.teczer.exponativewindtypescriptboilerplate',
+      packageName: 'com.delivra',
     },
     ios: {
       sourceDir: './ios',
@@ -15,5 +15,6 @@ module.exports = {
     },
   },
 };
+
 
 

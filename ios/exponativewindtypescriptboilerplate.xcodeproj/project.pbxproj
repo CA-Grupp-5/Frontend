@@ -352,7 +352,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.teczer.expo-nativewind-typescript-boilerplate";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.delivra";
 				PRODUCT_NAME = exponativewindtypescriptboilerplate;
 				SWIFT_OBJC_BRIDGING_HEADER = "exponativewindtypescriptboilerplate/exponativewindtypescriptboilerplate-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -383,7 +383,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.teczer.expo-nativewind-typescript-boilerplate";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.delivra";
 				PRODUCT_NAME = exponativewindtypescriptboilerplate;
 				SWIFT_OBJC_BRIDGING_HEADER = "exponativewindtypescriptboilerplate/exponativewindtypescriptboilerplate-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -541,3 +541,4 @@
 	};
 	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
 }
+

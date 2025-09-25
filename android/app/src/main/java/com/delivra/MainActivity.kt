@@ -1,4 +1,4 @@
-package com.teczer.exponativewindtypescriptboilerplate
+package com.delivra
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build
@@ -63,3 +63,4 @@ class MainActivity : ReactActivity() {
       super.invokeDefaultOnBackPressed()
   }
 }
+

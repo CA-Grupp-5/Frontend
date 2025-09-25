@@ -10,30 +10,30 @@ if (enableDevClient) {
 
 export default {
   expo: {
-    name: 'expo-nativewind-typescript-boilerplate',
-    slug: 'expo-nativewind-typescript-boilerplate',
+    name: 'delivra',
+    slug: 'delivra',
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
-    scheme: 'myapp',
+    scheme: 'delivra',
     userInterfaceStyle: 'automatic',
     newArchEnabled: false,
     splash: {
-      image: './assets/images/splash.png',
+      image: './assets/images/delivra-splash.png',
       resizeMode: 'contain',
-      backgroundColor: '#ffffff',
+      backgroundColor: '#081023',
     },
     ios: {
       supportsTablet: true,
-      bundleIdentifier: 'com.teczer.expo-nativewind-typescript-boilerplate',
+      bundleIdentifier: 'com.delivra',
     },
     android: {
       edgeToEdgeEnabled: true,
       adaptiveIcon: {
-        foregroundImage: './assets/images/adaptive-icon.png',
-        backgroundColor: '#ffffff',
+        foregroundImage: './assets/images/delivra-adaptive.png',
+        backgroundColor: '#081023',
       },
-      package: 'com.teczer.exponativewindtypescriptboilerplate',
+      package: 'com.delivra',
     },
     web: {
       bundler: 'metro',
@@ -51,6 +51,7 @@ export default {
     },
   },
 };
+
 
 
 
