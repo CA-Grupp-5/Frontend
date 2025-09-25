@@ -3,10 +3,10 @@ name: Android APK Builds
 on:
   push:
     branches:
-      - post-apk-build2-login
+      - build-fixes
   pull_request:
     branches:
-      - post-apk-build2-login
+      - build-fixes
   workflow_dispatch:
 
 jobs:
