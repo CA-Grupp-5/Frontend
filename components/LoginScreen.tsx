@@ -8,6 +8,7 @@ import {
   Dimensions,
   Animated,
   StyleSheet,
+  Image,
 } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -208,7 +209,10 @@ export default function LoginScreen() {
                     { backgroundColor: borderColor, shadowColor: borderColor }
                   ]}
                 >
-                  <FontAwesome name="truck" size={28} color="white" />
+                  <Image
+                    source={require('../assets/images/delivra-adaptive.png')}
+                    style={{ width: 80, height: 80, resizeMode: 'contain' }}
+                  />
                 </View>
                 <View>
                   <View className="flex-row items-center mb-1">
