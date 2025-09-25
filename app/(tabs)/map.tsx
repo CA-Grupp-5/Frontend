@@ -1,70 +1,119 @@
-import React, { useRef, useCallback, useEffect, useMemo } from 'react';
-import { Pressable,View } from 'react-native';
+import React, { useRef, useEffect, useMemo, useCallback } from 'react';
+import { Pressable, View } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import DriverSheet from '@/components/DriverSheet';
-import Colors, { Palette } from '@/constants/Colors';
+import Colors from '@/constants/Colors';
 import Constants from 'expo-constants';
 import { geocodeAddress } from '@/lib/mapbox';
 
+const BOUNDS_PADDING = 48;
+
+type Coordinate = [number, number];
+
+const computeBoundsBetween = (start: Coordinate, end: Coordinate) => {
+  const longitudes = [start[0], end[0]];
+  const latitudes = [start[1], end[1]];
+
+  return {
+    ne: [Math.max(...longitudes), Math.max(...latitudes)] as Coordinate,
+    sw: [Math.min(...longitudes), Math.min(...latitudes)] as Coordinate,
+  };
+};
+
+const computeBoundsFromRoute = (routeGeom: any) => {
+  const coords = (routeGeom?.coordinates ?? []) as Coordinate[];
+  if (!Array.isArray(coords) || coords.length < 2) return null;
+
+  const longitudes = coords.map(([lon]) => lon);
+  const latitudes = coords.map(([, lat]) => lat);
+
+  return {
+    ne: [Math.max(...longitudes), Math.max(...latitudes)] as Coordinate,
+    sw: [Math.min(...longitudes), Math.min(...latitudes)] as Coordinate,
+  };
+};
+
 export default function MapScreen() {
   const cameraRef = useRef<Mapbox.Camera>(null);
-  const initializedRef = useRef(false);
+  const routeBoundsAppliedRef = useRef(false);
+  const [mapReady, setMapReady] = React.useState(false);
   const { colorScheme } = useColorScheme();
   const tint = Colors[colorScheme ?? 'light'].tint;
   const [sheetVisible, setSheetVisible] = React.useState(false);
 
-  // Origin (truck) coordinate (lon, lat)
-  const ORIGIN: [number, number] = [18.0686, 59.3293];
-  // Destination: default on-land point in Stockholm (Tele2 Arena vicinity)
-  // !MIGHT BE WHY BUILD WILL OCCASIONALLY SHOW PATH DOWN TO A WRONG HOME, CHECK TIMING OR REMOVE DEFAULT HERE
-  // You can override this by setting HOME_ADDRESS below.
-  const [home, setHome] = React.useState<[number, number]>([18.0911, 59.2934]);
-  // Set this to any address you want (e.g., 'Arenaslingan 14, Johanneshov, Stockholm').
-  // Leave as empty string to use the default coordinates above.
-  const HOME_ADDRESS = 'Sveavägen 168, 113 46 Stockholm, Sweden' as const;
+  const ORIGIN: Coordinate = [18.0686, 59.3293];
+  const INITIAL_DESTINATION: Coordinate = [18.0911, 59.2934];
+  const [home, setHome] = React.useState<Coordinate>(INITIAL_DESTINATION);
+  const HOME_ADDRESS = 'Sveavagen 168, 113 46 Stockholm, Sweden' as const;
 
-  // Navigation state
-  const [routeGeom, setRouteGeom] = React.useState<any | null>(null); // GeoJSON LineString
+  const [routeGeom, setRouteGeom] = React.useState<any | null>(null);
   const [eta, setEta] = React.useState<string>('');
 
-  const driver = React.useMemo(() => ({
-    name: 'Marcus Johnson',
-    role: 'Your delivery driver',
-    rating: 4.8,
-    eta: eta || '—',
-    progress: 75,
-    photo: require('../../assets/images/driver-headshot.png'),
-  }), [eta]);
+  const driver = React.useMemo(
+    () => ({
+      name: 'Marcus Johnson',
+      role: 'Your delivery driver',
+      rating: 4.8,
+      eta: eta || '--',
+      progress: 75,
+      photo: require('../../assets/images/driver-headshot.png'),
+    }),
+    [eta]
+  );
 
-  const setInitialCamera = useCallback(() => {
-    if (initializedRef.current) return;
-    initializedRef.current = true;
+  const initialBounds = useMemo(() => computeBoundsBetween(ORIGIN, INITIAL_DESTINATION), []);
+
+  const fitBounds = useCallback((bounds: { ne: Coordinate; sw: Coordinate }, duration: number) => {
     requestAnimationFrame(() => {
       cameraRef.current?.setCamera({
-        centerCoordinate: ORIGIN,
-        zoomLevel: 12,
-        animationDuration: 0,
+        bounds: {
+          ...bounds,
+          paddingLeft: BOUNDS_PADDING,
+          paddingRight: BOUNDS_PADDING,
+          paddingTop: BOUNDS_PADDING,
+          paddingBottom: BOUNDS_PADDING,
+        },
+        animationDuration: duration,
       });
     });
   }, []);
 
-  // Optionally geocode manual HOME address
+  const fitEndpoints = useCallback(
+    (duration = 0) => {
+      fitBounds(computeBoundsBetween(ORIGIN, home), duration);
+    },
+    [home, fitBounds]
+  );
+
+  const handleMapLoaded = useCallback(() => {
+    setMapReady(true);
+    routeBoundsAppliedRef.current = false;
+    fitEndpoints(0);
+  }, [fitEndpoints]);
+
   useEffect(() => {
     if (!HOME_ADDRESS) return;
     geocodeAddress(HOME_ADDRESS, { country: 'SE', proximity: ORIGIN, limit: 5 })
       .then((feature) => {
-        if (feature?.center) setHome(feature.center);
+        if (feature?.center) setHome(feature.center as Coordinate);
       })
       .catch(() => {});
   }, []);
 
-  // Fetch a live route and ETA using Mapbox Directions API
+  useEffect(() => {
+    if (!mapReady) return;
+    fitEndpoints(0);
+    routeBoundsAppliedRef.current = false;
+  }, [home, mapReady, fitEndpoints]);
+
   useEffect(() => {
     const token = (Constants?.expoConfig?.extra as any)?.MAPBOX_ACCESS_TOKEN as string | undefined;
     if (!token || !home) return;
+
+    routeBoundsAppliedRef.current = false;
 
     const fetchRoute = async () => {
       try {
@@ -87,91 +136,105 @@ export default function MapScreen() {
     fetchRoute();
   }, [home]);
 
+  useEffect(() => {
+    if (!mapReady || routeBoundsAppliedRef.current || !routeGeom) return;
+    const bounds = computeBoundsFromRoute(routeGeom);
+    if (!bounds) return;
+
+    fitBounds(bounds, 400);
+    routeBoundsAppliedRef.current = true;
+  }, [routeGeom, fitBounds, mapReady]);
+
   const routeFeature = useMemo(() => (routeGeom ? { type: 'Feature', geometry: routeGeom } : null), [routeGeom]);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
       <Mapbox.MapView
-          style={{ flex: 1 }}
-          styleURL={Mapbox.StyleURL.Dark}
-          attributionEnabled={true}
-          logoEnabled={true}
-          zoomEnabled={true}
-          scrollEnabled={true}
-          rotateEnabled={true}
-          pitchEnabled={true}
-          compassEnabled={true}
-          gestureSettings={{
-            panEnabled: true,
-            pinchPanEnabled: true,
-            pinchZoomEnabled: true,
-            rotateEnabled: true,
-            pitchEnabled: true,
-            quickZoomEnabled: true,
-            simultaneousRotateAndPinchZoomEnabled: true,
-            doubleTapToZoomInEnabled: true,
-            doubleTouchToZoomOutEnabled: true,
+        style={{ flex: 1 }}
+        styleURL={Mapbox.StyleURL.Dark}
+        attributionEnabled
+        logoEnabled
+        zoomEnabled
+        scrollEnabled
+        rotateEnabled
+        pitchEnabled
+        compassEnabled
+        gestureSettings={{
+          panEnabled: true,
+          pinchPanEnabled: true,
+          pinchZoomEnabled: true,
+          rotateEnabled: true,
+          pitchEnabled: true,
+          quickZoomEnabled: true,
+          simultaneousRotateAndPinchZoomEnabled: true,
+          doubleTapToZoomInEnabled: true,
+          doubleTouchToZoomOutEnabled: true,
+        }}
+        onDidFinishLoadingMap={handleMapLoaded}
+      >
+        <Mapbox.Camera
+          ref={cameraRef}
+          defaultSettings={{
+            bounds: {
+              ...initialBounds,
+              paddingLeft: BOUNDS_PADDING,
+              paddingRight: BOUNDS_PADDING,
+              paddingTop: BOUNDS_PADDING,
+              paddingBottom: BOUNDS_PADDING,
+            },
           }}
-          onDidFinishLoadingMap={setInitialCamera}
-        >
-          <Mapbox.Camera ref={cameraRef} />
+        />
 
-          {/* Render route line if present */}
-          {/* play around a bit with line color, width and opacity for a pro look */}
-          {routeFeature && (
-            <Mapbox.ShapeSource id="routeSource" shape={routeFeature as any}>
-              <Mapbox.LineLayer
-                id="routeLine"
-                style={{
-                  lineColor: tint,
-                  lineWidth: 4,
-                  lineOpacity: 0.9,
-                  lineCap: 'round',
-                  lineJoin: 'round'
-                  
-                }}
-              />
-            </Mapbox.ShapeSource>
-          )}
+        {routeFeature && (
+          <Mapbox.ShapeSource id="routeSource" shape={routeFeature as any}>
+            <Mapbox.LineLayer
+              id="routeLine"
+              style={{
+                lineColor: tint,
+                lineWidth: 4,
+                lineOpacity: 0.9,
+                lineCap: 'round',
+                lineJoin: 'round',
+              }}
+            />
+          </Mapbox.ShapeSource>
+        )}
 
-          {/* Truck marker */}
-          <Mapbox.MarkerView coordinate={ORIGIN} anchor={{ x: 0.5, y: 0.5 }}>
-            <Pressable onPress={() => setSheetVisible(true)}>
-              <View
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 24,
-                  backgroundColor: tint,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <FontAwesome name="truck" size={24} color={'hsl(0, 0%, 100%)'} />
-              </View>
-            </Pressable>
-          </Mapbox.MarkerView>
-
-          {/* Home marker (destination) */}
-          {/* could add tip indicator and elevate */}
-          <Mapbox.MarkerView coordinate={home} anchor={{ x: 0.5, y: 1 }}>
-            <View style={{ alignItems: 'center' }}>
-              <View
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 22,
-                  backgroundColor: tint,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <FontAwesome name="home" size={22} color={'hsl(0, 0%, 100%)'} />
-              </View>
+        <Mapbox.MarkerView coordinate={ORIGIN} anchor={{ x: 0.5, y: 0.5 }}>
+          <Pressable onPress={() => setSheetVisible(true)}>
+            <View
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                backgroundColor: tint,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <FontAwesome name="truck" size={24} color={'hsl(0, 0%, 100%)'} />
             </View>
-          </Mapbox.MarkerView>
+          </Pressable>
+        </Mapbox.MarkerView>
 
-        </Mapbox.MapView>
+        <Mapbox.MarkerView coordinate={home} anchor={{ x: 0.5, y: 1 }}>
+          <View style={{ alignItems: 'center' }}>
+            <View
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: tint,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <FontAwesome name="home" size={22} color={'hsl(0, 0%, 100%)'} />
+            </View>
+          </View>
+        </Mapbox.MarkerView>
+      </Mapbox.MapView>
+
       <DriverSheet visible={sheetVisible} onClose={() => setSheetVisible(false)} driver={driver} />
     </SafeAreaView>
   );

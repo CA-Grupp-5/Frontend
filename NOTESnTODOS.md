@@ -1,3 +1,7 @@
+ADD MAP TOGGLE IN MAP
+MORE SETTINGS OPTIONS
+
+
 --using default dev client command use backup script if wifi acts up
 
  

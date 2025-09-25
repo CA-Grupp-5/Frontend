@@ -27,6 +27,11 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
+LogBox.ignoreLogs([
+  '`new NativeEventEmitter()` was called with a non-null argument without the required `addListener` method.',
+  '`new NativeEventEmitter()` was called with a non-null argument without the required `removeListeners` method.',
+]);
+
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -48,12 +53,6 @@ export default function RootLayout() {
     // Initialize Mapbox once at app startup using a non-committed env/config value
     const token = (Constants?.expoConfig?.extra as any)?.MAPBOX_ACCESS_TOKEN as string | undefined;
     Mapbox.setAccessToken(token ?? '');
-
-    // Silence noisy NativeEventEmitter warnings from third-party modules during dev
-    LogBox.ignoreLogs([
-      '`new NativeEventEmitter()` was called with a non-null argument without the required `addListener` method.',
-      '`new NativeEventEmitter()` was called with a non-null argument without the required `removeListeners` method.',
-    ]);
   }, []);
 
   if (!loaded) {
