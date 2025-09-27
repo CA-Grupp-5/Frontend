@@ -26,6 +26,12 @@ Developer experience first:
 - Node.js 22+ (Recommended LTS)
 - BUN IS VERY RECOMMENDED
 
+### Mapbox Setup
+
+- Copy `.env.example` to `.env.local` and populate both `MAPBOX_DOWNLOADS_TOKEN` (secret, starts with `sk.`) and `MAPBOX_ACCESS_TOKEN` (public, starts with `pk.`). `.env.local` is git-ignored.
+- Alternatively, add `MAPBOX_DOWNLOADS_TOKEN=sk.your_token` to `~/.gradle/gradle.properties` if you prefer managing secrets there. Never commit the real token to this repo.
+- CI workflows read the tokens from GitHub Actions secrets and expose them as environment variables, so no files are rewritten during automated builds.
+
 ### Dev build shortcuts
 
 Two convenience scripts are available to run CI-style builds with Bun:

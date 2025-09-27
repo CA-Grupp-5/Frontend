@@ -96,6 +96,9 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0.0"
+        def mapboxAccessToken = (findProperty("MAPBOX_ACCESS_TOKEN") ?: System.getenv("MAPBOX_ACCESS_TOKEN") ?: "")
+        def escapedMapboxAccessToken = mapboxAccessToken.replace('\\', '\\\\').replace('"', '\\"')
+        buildConfigField("String", "MAPBOX_ACCESS_TOKEN", "\"${escapedMapboxAccessToken}\"")
     }
     signingConfigs {
         debug {

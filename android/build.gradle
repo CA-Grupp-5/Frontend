@@ -12,46 +12,5 @@ buildscript {
   }
 }
 
-def reactNativeAndroidDir = new File(
-  providers.exec {
-    workingDir(rootDir)
-    commandLine("node", "--print", "require.resolve('react-native/package.json')")
-  }.standardOutput.asText.get().trim(),
-  "../android"
-)
-
-def mapboxDownloadsToken = (providers.gradleProperty('MAPBOX_DOWNLOADS_TOKEN').orNull ?: System.getenv('MAPBOX_DOWNLOADS_TOKEN'))?.trim()
-if (!mapboxDownloadsToken) {
-  throw new GradleException('MAPBOX_DOWNLOADS_TOKEN is required to download Mapbox native artifacts. Set it in android/gradle.properties or export MAPBOX_DOWNLOADS_TOKEN before building.')
-}
-
-allprojects {
-  repositories {
-    maven {
-      url 'https://api.mapbox.com/downloads/v2/releases/maven'
-      authentication {
-        basic(BasicAuthentication)
-      }
-      credentials {
-        // Do not change the username below. It should always be "mapbox"
-        username = "mapbox"
-        // Use the secret token you stored in gradle.properties as the password
-        password = mapboxDownloadsToken
-      }
-    }
-    maven {
-      // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-      url(reactNativeAndroidDir)
-    }
-
-    google()
-    mavenCentral()
-    maven { url 'https://www.jitpack.io' }
-  }
-}
-
 apply plugin: "expo-root-project"
 apply plugin: "com.facebook.react.rootproject"
-
-
-

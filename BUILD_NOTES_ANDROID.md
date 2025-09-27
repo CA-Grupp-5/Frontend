@@ -46,40 +46,50 @@ This avoids pulling in `react-native-worklets/plugin`, which caused Metro/Babel 
 ### `android/gradle.properties`
 
 ```
-MAPBOX_DOWNLOADS_TOKEN=<token>
 hermesEnabled=true
 android.useAndroidX=true
 org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError -Dkotlin.daemon.jvm.options=-Xmx4g
 ```
 
 - Hermes stays enabled (`true`).
-- Additional JVM heap (6?GB) prevents `lintVitalAnalyzeRelease` from exhausting heap when building bundles.
+- Additional JVM heap (6 GB) prevents `lintVitalAnalyzeRelease` from exhausting heap when building bundles.
+- Mapbox downloads token is now resolved automatically; keep secrets out of version control and let `settings.gradle` read them from your preferred source.
 
-### Root `android/build.gradle`
+### `android/settings.gradle`
 
-Ensures the Mapbox Maven repo uses a runtime token:
-
-```groovy
-def mapboxDownloadsToken = (providers.gradleProperty('MAPBOX_DOWNLOADS_TOKEN').orNull ?: System.getenv('MAPBOX_DOWNLOADS_TOKEN'))?.trim()
-if (!mapboxDownloadsToken) {
-  throw new GradleException('MAPBOX_DOWNLOADS_TOKEN is required to download Mapbox native artifacts. Set it in android/gradle.properties or export MAPBOX_DOWNLOADS_TOKEN before building.')
-}
-
-allprojects {
+```
+dependencyResolutionManagement {
+  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
   repositories {
+    google()
+    mavenCentral()
+    maven { url = uri("$rootDir/../node_modules/react-native/android") }
+    maven { url = uri("$rootDir/../node_modules/jsc-android/dist") }
     maven {
-      url 'https://api.mapbox.com/downloads/v2/releases/maven'
-      authentication { basic(BasicAuthentication) }
+      url = uri("https://api.mapbox.com/downloads/v2/releases/maven")
       credentials {
-        username = 'mapbox'
+        username = "mapbox"
         password = mapboxDownloadsToken
       }
+      authentication { basic(BasicAuthentication) }
     }
-    // ... other repos
   }
 }
 ```
 
+- `mapboxDownloadsToken` resolves once at the top of the file in this order: `-PMAPBOX_DOWNLOADS_TOKEN=...`, `MAPBOX_DOWNLOADS_TOKEN` environment variable, `.env.local` in the repo root, then `~/.gradle/gradle.properties`. An empty or missing token throws a clear Gradle exception.
+- Developers can copy `.env.example` to `.env.local` and paste their personal tokens; `.env.local` is git-ignored.
+- CI exposes both `MAPBOX_DOWNLOADS_TOKEN` and `MAPBOX_ACCESS_TOKEN` via workflow `env`, so no files need to be rewritten during builds.
+
+### `android/app/build.gradle`
+
+```
+        def mapboxAccessToken = (findProperty("MAPBOX_ACCESS_TOKEN") ?: System.getenv("MAPBOX_ACCESS_TOKEN") ?: "")
+        def escapedMapboxAccessToken = mapboxAccessToken.replace('\\', '\\\\').replace('"', '\\"')
+        buildConfigField("String", "MAPBOX_ACCESS_TOKEN", "\"${escapedMapboxAccessToken}\"")
+```
+
+- Exposes the public Mapbox access token as `BuildConfig.MAPBOX_ACCESS_TOKEN` for runtime use while keeping it out of source files.
 ### `android/app/src/main/res/values/styles.xml`
 
 ```xml
@@ -99,5 +109,4 @@ cd android
 ./gradlew.bat assembleRelease --no-daemon
 ```
 
-Make sure `MAPBOX_DOWNLOADS_TOKEN` is present via `android/gradle.properties` or the environment before running the release build.
-
+Make sure `MAPBOX_DOWNLOADS_TOKEN` is available through `~/.gradle/gradle.properties` or the environment before running the release build.

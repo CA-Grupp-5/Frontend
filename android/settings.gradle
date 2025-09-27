@@ -1,3 +1,98 @@
+import java.util.Properties
+import org.gradle.api.initialization.resolve.RepositoriesMode
+import org.gradle.authentication.http.BasicAuthentication
+
+def readTokenFromEnvLikeFile = { File file ->
+    if (!file.exists()) {
+        return null
+    }
+
+    def tokenLine = file.readLines()
+        .collect { it.trim() }
+        .find { line ->
+            if (line.isEmpty() || line.startsWith('#')) {
+                return false
+            }
+            def parts = line.split('=', 2)
+            if (parts.length != 2) {
+                return false
+            }
+            def key = parts[0].trim()
+            if (key.startsWith('export ')) {
+                key = key.substring('export '.length()).trim()
+            }
+            return key == 'MAPBOX_DOWNLOADS_TOKEN'
+        }
+
+    if (!tokenLine) {
+        return null
+    }
+
+    def value = tokenLine.split('=', 2)[1].trim()
+    if (value.contains('#')) {
+        value = value.split('#', 2)[0].trim()
+    }
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+        value = value.substring(1, value.length() - 1)
+    }
+
+    return value.isEmpty() ? null : value
+}
+
+def readTokenFromGradleProperties = { File file ->
+    if (!file.exists()) {
+        return null
+    }
+
+    def props = new Properties()
+    file.withInputStream { props.load(it) }
+    return props.getProperty('MAPBOX_DOWNLOADS_TOKEN')?.trim()
+}
+
+def mapboxDownloadsToken = gradle.startParameter.projectProperties['MAPBOX_DOWNLOADS_TOKEN']
+if (!mapboxDownloadsToken) {
+    mapboxDownloadsToken = System.getenv('MAPBOX_DOWNLOADS_TOKEN')
+}
+if (!mapboxDownloadsToken) {
+    mapboxDownloadsToken = readTokenFromEnvLikeFile(new File(rootDir, '.env.local'))
+}
+if (!mapboxDownloadsToken) {
+    mapboxDownloadsToken = readTokenFromGradleProperties(new File(System.getProperty('user.home'), '.gradle/gradle.properties'))
+}
+if (!mapboxDownloadsToken) {
+    throw new GradleException('Missing MAPBOX_DOWNLOADS_TOKEN. Provide it via -PMAPBOX_DOWNLOADS_TOKEN=..., environment variable, .env.local, or ~/.gradle/gradle.properties.')
+}
+mapboxDownloadsToken = mapboxDownloadsToken.trim()
+if (mapboxDownloadsToken.isEmpty()) {
+    throw new GradleException('MAPBOX_DOWNLOADS_TOKEN was resolved but is empty. Confirm your configuration.')
+}
+
+ext.mapboxDownloadsToken = mapboxDownloadsToken
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+
+        maven {
+            url = uri("$rootDir/../node_modules/react-native/android")
+        }
+        maven {
+            url = uri("$rootDir/../node_modules/jsc-android/dist")
+        }
+        maven {
+            url = uri("https://api.mapbox.com/downloads/v2/releases/maven")
+            credentials {
+                username = 'mapbox'
+                password = mapboxDownloadsToken
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
+}
 pluginManagement {
   def reactNativeGradlePlugin = new File(
     providers.exec {
