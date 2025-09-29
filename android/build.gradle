@@ -21,8 +21,36 @@ def reactNativeAndroidDir = new File(
 )
 
 def mapboxDownloadsToken = (providers.gradleProperty('MAPBOX_DOWNLOADS_TOKEN').orNull ?: System.getenv('MAPBOX_DOWNLOADS_TOKEN'))?.trim()
+
 if (!mapboxDownloadsToken) {
-  throw new GradleException('MAPBOX_DOWNLOADS_TOKEN is required to download Mapbox native artifacts. Set it in android/gradle.properties or export MAPBOX_DOWNLOADS_TOKEN before building.')
+  def envToken = null
+  try {
+    def candidates = [
+      new File(rootDir.parentFile, ".env"),
+      new File(rootDir, ".env")
+    ]
+    for (f in candidates) {
+      if (f != null && f.exists()) {
+        for (line in f.readLines('UTF-8')) {
+          def m = (line =~ /^\s*(?:export\s+)?MAPBOX_DOWNLOADS_TOKEN\s*=\s*(.*)\s*$/)
+          if (m.matches()) {
+            def v = m[0][1].trim()
+            if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith('\'') && v.endsWith('\''))) {
+              v = v.substring(1, v.length() - 1)
+            }
+            envToken = v?.trim()
+            break
+          }
+        }
+      }
+      if (envToken) break
+    }
+  } catch (Exception ignored) {}
+  mapboxDownloadsToken = envToken?.trim()
+}
+
+if (!mapboxDownloadsToken) {
+  throw new GradleException('MAPBOX_DOWNLOADS_TOKEN is required to download Mapbox native artifacts. Provide it via android/gradle.properties, OS env, or .env at project root.')
 }
 
 allprojects {
