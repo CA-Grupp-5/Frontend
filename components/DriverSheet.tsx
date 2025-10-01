@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Colors, { Palette } from '@/constants/Colors';
 import { useColorScheme } from 'nativewind';
+// Navigation not needed here; parent controls packages modal
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -16,7 +17,7 @@ export type DriverInfo = {
   progress: number; // 0-100
 };
 
-export default function DriverSheet({ visible, onClose, driver }: { visible: boolean; onClose: () => void; driver: DriverInfo }) {
+export default function DriverSheet({ visible, onClose, driver, onOpenPackages }: { visible: boolean; onClose: () => void; driver: DriverInfo; onOpenPackages?: () => void }) {
   const { colorScheme } = useColorScheme();
   const scheme = colorScheme ?? 'dark';
   const [open, setOpen] = useState(visible);
@@ -97,7 +98,7 @@ const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.l
 
           {/* Actions */}
           <Pressable
-            onPress={() => {/* TODO: hook message action */}}
+            onPress={() => {/* TODO: hook call action */}}
             style={{
               borderWidth: 1,
               borderColor: tint,
@@ -109,10 +110,20 @@ const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.l
               gap: 8,
             }}
           >
-            <FontAwesome name="comment" size={16} color={tint} />
-            <Text style={{ color: tint, fontWeight: '600' }}>Message</Text>
+            <FontAwesome name="phone" size={16} color={tint} />
+            <Text style={{ color: tint, fontWeight: '600' }}>Call</Text>
           </Pressable>
-
+          {/* Packages link */}
+          <Pressable
+            onPress={() => {
+              onClose();
+              onOpenPackages?.();
+            }}
+            style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 16, flexDirection: 'row', gap: 8 }}
+          >
+            <FontAwesome name="cube" size={16} color={tint} />
+            <Text style={{ color: scheme === 'dark' ? Palette.gray200 : Palette.gray900, fontWeight: '600' }}>Packages</Text>
+          </Pressable>
           <Pressable onPress={onClose} style={{ alignItems: 'center', paddingVertical: 16 }}>
 <Text style={{ color: scheme === 'dark' ? Palette.gray200 : Palette.gray900, fontWeight: '600' }}>Close</Text>
           </Pressable>

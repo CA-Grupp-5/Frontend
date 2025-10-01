@@ -5,6 +5,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import DriverSheet from '@/components/DriverSheet';
+import { PackagesModal } from '@/components/PackagesModal';
 import Colors from '@/constants/Colors';
 import Constants from 'expo-constants';
 import { geocodeAddress } from '@/lib/mapbox';
@@ -43,6 +44,7 @@ export default function MapScreen() {
   const { colorScheme } = useColorScheme();
   const tint = Colors[colorScheme ?? 'light'].tint;
   const [sheetVisible, setSheetVisible] = React.useState(false);
+  const [packagesVisible, setPackagesVisible] = React.useState(false);
 
   const ORIGIN: Coordinate = [18.0686, 59.3293];
   // const INITIAL_DESTINATION: Coordinate = [18.0911, 59.2934];
@@ -238,7 +240,15 @@ export default function MapScreen() {
         )}
       </Mapbox.MapView>
 
-      <DriverSheet visible={sheetVisible} onClose={() => setSheetVisible(false)} driver={driver} />
+      <DriverSheet
+        visible={sheetVisible}
+        onClose={() => setSheetVisible(false)}
+        driver={driver}
+        onOpenPackages={() => {
+          setPackagesVisible(true);
+        }}
+      />
+      <PackagesModal isOpen={packagesVisible} onClose={() => setPackagesVisible(false)} />
     </SafeAreaView>
   );
 }
