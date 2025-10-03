@@ -1,12 +1,12 @@
 import React, { useRef, useEffect, useMemo, useCallback } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, View, Text } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import DriverSheet from '@/components/DriverSheet';
 import { PackagesModal } from '@/components/PackagesModal';
-import Colors from '@/constants/Colors';
+import Colors, { Palette } from '@/constants/Colors';
 import Constants from 'expo-constants';
 import { geocodeAddress } from '@/lib/mapbox';
 
@@ -37,14 +37,36 @@ const computeBoundsFromRoute = (routeGeom: any) => {
   };
 };
 
+const expandBoundsAround = (center: Coordinate, dLon: number, dLat: number) => {
+  const [lon, lat] = center;
+  return {
+    ne: [lon + dLon, lat + dLat] as Coordinate,
+    sw: [lon - dLon, lat - dLat] as Coordinate,
+  };
+};
+
 export default function MapScreen() {
   const cameraRef = useRef<Mapbox.Camera>(null);
   const routeBoundsAppliedRef = useRef(false);
   const [mapReady, setMapReady] = React.useState(false);
   const { colorScheme } = useColorScheme();
   const tint = Colors[colorScheme ?? 'light'].tint;
+  const isDark = (colorScheme ?? 'light') === 'dark';
   const [sheetVisible, setSheetVisible] = React.useState(false);
   const [packagesVisible, setPackagesVisible] = React.useState(false);
+
+  
+  const STYLE_OPTIONS = React.useMemo(
+    () => [
+      { key: 'dark', label: 'Dark', url: Mapbox.StyleURL.Dark },
+      { key: 'light', label: 'Light', url: Mapbox.StyleURL.Street },
+      { key: 'satellite', label: 'Satellite', url: "mapbox://styles/mapbox/satellite-streets-v12"}
+
+    ],
+    []
+  );
+  const [styleIndex, setStyleIndex] = React.useState(0);
+  const currentStyle = STYLE_OPTIONS[styleIndex];
 
   const ORIGIN: Coordinate = [18.0686, 59.3293];
   // const INITIAL_DESTINATION: Coordinate = [18.0911, 59.2934];
@@ -66,7 +88,7 @@ export default function MapScreen() {
     [eta]
   );
 
-  const defaultBounds = useMemo(() => computeBoundsBetween(ORIGIN, ORIGIN), []);
+  const defaultBounds = useMemo(() => expandBoundsAround(ORIGIN, 0.12, 0.08), []);
 
   const fitBounds = useCallback((bounds: { ne: Coordinate; sw: Coordinate }, duration: number) => {
     requestAnimationFrame(() => {
@@ -94,8 +116,7 @@ export default function MapScreen() {
   const handleMapLoaded = useCallback(() => {
     setMapReady(true);
     routeBoundsAppliedRef.current = false;
-    fitEndpoints(0);
-  }, [fitEndpoints]);
+  }, []);
 
   useEffect(() => {
     if (!HOME_ADDRESS) return;
@@ -108,9 +129,8 @@ export default function MapScreen() {
 
   useEffect(() => {
     if (!mapReady || !home) return;
-    fitEndpoints(0);
     routeBoundsAppliedRef.current = false;
-  }, [home, mapReady, fitEndpoints]);
+  }, [home, mapReady]);
 
   useEffect(() => {
     const token = (Constants?.expoConfig?.extra as any)?.MAPBOX_ACCESS_TOKEN as string | undefined;
@@ -154,7 +174,7 @@ export default function MapScreen() {
     <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right']}>
       <Mapbox.MapView
         style={{ flex: 1 }}
-        styleURL={Mapbox.StyleURL.Dark}
+        styleURL={currentStyle.url}
         attributionEnabled
         logoEnabled
         zoomEnabled
@@ -239,6 +259,39 @@ export default function MapScreen() {
           </Mapbox.MarkerView>
         )}
       </Mapbox.MapView>
+
+      {/* Map style toggle */}
+      <View
+        style={{ position: 'absolute', right: 16, bottom: 16, zIndex: 10 }}
+        pointerEvents="box-none"
+      >
+        <Pressable
+          onPress={() => setStyleIndex((prev) => (prev + 1) % STYLE_OPTIONS.length)}
+          accessibilityRole="button"
+          accessibilityLabel={`Map style: ${currentStyle.label}`}
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingHorizontal: 12,
+            paddingVertical: 10,
+            borderRadius: 22,
+            backgroundColor: isDark ? Palette.darkCardBg : Palette.lightCardBg,
+            borderWidth: 1,
+            borderColor: Colors[colorScheme ?? 'light'].tabBarBorder,
+            gap: 8,
+            shadowColor: '#000',
+            shadowOpacity: 0.15,
+            shadowRadius: 6,
+            shadowOffset: { width: 0, height: 2 },
+            elevation: 3,
+          }}
+        >
+          <FontAwesome name="map" size={16} color={tint} />
+          <Text style={{ color: Colors[colorScheme ?? 'light'].text, fontWeight: '600' }}>
+            {currentStyle.label}
+          </Text>
+        </Pressable>
+      </View>
 
       <DriverSheet
         visible={sheetVisible}
