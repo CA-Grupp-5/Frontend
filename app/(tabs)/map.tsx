@@ -14,15 +14,7 @@ const BOUNDS_PADDING = 48;
 
 type Coordinate = [number, number];
 
-const computeBoundsBetween = (start: Coordinate, end: Coordinate) => {
-  const longitudes = [start[0], end[0]];
-  const latitudes = [start[1], end[1]];
 
-  return {
-    ne: [Math.max(...longitudes), Math.max(...latitudes)] as Coordinate,
-    sw: [Math.min(...longitudes), Math.min(...latitudes)] as Coordinate,
-  };
-};
 
 const computeBoundsFromRoute = (routeGeom: any) => {
   const coords = (routeGeom?.coordinates ?? []) as Coordinate[];
@@ -67,8 +59,8 @@ export default function MapScreen() {
   );
   const [styleIndex, setStyleIndex] = React.useState(0);
   const currentStyle = STYLE_OPTIONS[styleIndex];
-
-  const ORIGIN: Coordinate = [18.0686, 59.3293];
+  
+  const driver_position = useMemo<Coordinate>(() => [18.0686, 59.3293], []);
   // const INITIAL_DESTINATION: Coordinate = [18.0911, 59.2934];
   const HOME_ADDRESS = 'Sveavagen 168, 113 46 Stockholm, Sweden' as const;
   const [home, setHome] = React.useState<Coordinate | null>(null);
@@ -88,7 +80,7 @@ export default function MapScreen() {
     [eta]
   );
 
-  const defaultBounds = useMemo(() => expandBoundsAround(ORIGIN, 0.12, 0.08), []);
+  const defaultBounds = useMemo(() => expandBoundsAround(driver_position, 0.12, 0.08), [driver_position]);
 
   const fitBounds = useCallback((bounds: { ne: Coordinate; sw: Coordinate }, duration: number) => {
     requestAnimationFrame(() => {
@@ -105,13 +97,7 @@ export default function MapScreen() {
     });
   }, []);
 
-  const fitEndpoints = useCallback(
-    (duration = 0) => {
-      if (!home) return;
-      fitBounds(computeBoundsBetween(ORIGIN, home), duration);
-    },
-    [home, fitBounds]
-  );
+  
 
   const handleMapLoaded = useCallback(() => {
     setMapReady(true);
@@ -120,12 +106,12 @@ export default function MapScreen() {
 
   useEffect(() => {
     if (!HOME_ADDRESS) return;
-    geocodeAddress(HOME_ADDRESS, { country: 'SE', proximity: ORIGIN, limit: 5 })
+    geocodeAddress(HOME_ADDRESS, { country: 'SE', proximity: driver_position, limit: 5 })
       .then((feature) => {
         if (feature?.center) setHome(feature.center as Coordinate);
       })
       .catch(() => {});
-  }, []);
+  }, [driver_position]);
 
   useEffect(() => {
     if (!mapReady || !home) return;
@@ -140,7 +126,7 @@ export default function MapScreen() {
 
     const fetchRoute = async () => {
       try {
-        const url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${ORIGIN[0]},${ORIGIN[1]};${home[0]},${home[1]}?geometries=geojson&overview=full&annotations=duration,distance&steps=false&access_token=${token}`;
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${driver_position[0]},${driver_position[1]};${home[0]},${home[1]}?geometries=geojson&overview=full&annotations=duration,distance&steps=false&access_token=${token}`;
         const res = await fetch(url);
         const json = await res.json();
         const first = json?.routes?.[0];
@@ -157,7 +143,7 @@ export default function MapScreen() {
     };
 
     fetchRoute();
-  }, [home]);
+  }, [home, driver_position]);
 
   useEffect(() => {
     if (!mapReady || routeBoundsAppliedRef.current || !routeGeom) return;
@@ -223,7 +209,7 @@ export default function MapScreen() {
           </Mapbox.ShapeSource>
         )}
 
-        <Mapbox.MarkerView coordinate={ORIGIN} anchor={{ x: 0.5, y: 0.5 }}>
+        <Mapbox.MarkerView coordinate={driver_position} anchor={{ x: 0.5, y: 0.5 }}>
           <Pressable onPress={() => setSheetVisible(true)}>
             <View
               style={{

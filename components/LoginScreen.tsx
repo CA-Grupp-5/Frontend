@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Alert,
   Dimensions,
-  Animated,
   StyleSheet,
   Image,
 } from 'react-native';
@@ -138,6 +137,7 @@ export default function LoginScreen() {
         Alert.alert('Error', 'Invalid email or password');
       }
     } catch (error) {
+      console.log(error)
       Alert.alert('Error', 'Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
@@ -146,7 +146,7 @@ export default function LoginScreen() {
 
   const isDark = colorScheme === 'dark';
   
-  const bgColor = isDark ? Palette.gray900 : Palette.gray50;
+  // const bgColor = isDark ? Palette.gray900 : Palette.gray50;
   const cardBgColor = isDark ? Palette.darkCardBg : Palette.lightCardBg;
   const inputBgColor = isDark ? Palette.gray600 : Palette.gray200;
   const textColor = isDark ? Palette.white : Palette.gray900;

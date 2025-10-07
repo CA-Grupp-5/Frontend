@@ -13,3 +13,8 @@ NEXT
  QR SCAN
  PUSH NOTIFICATIONS
 
+
+
+linter (add to docs)
+bunx eslint . --ext .ts,.tsx,.js,.jsx
+

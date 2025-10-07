@@ -27,14 +27,14 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       isAuthenticated: false,
       rememberMe: false,
       // Temporary for testing/dev phase
       login: async (email: string, password: string, rememberMe = false): Promise<boolean> => {
         set({ 
           isAuthenticated: true, 
-          rememberMe 
+            rememberMe 
         });
         return true;
       },

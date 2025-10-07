@@ -63,7 +63,7 @@ export default function TabLayout() {
               </Pressable>
             </Link>
           ),
-          tabBarIcon: ({ focused, color }) => (
+          tabBarIcon: ({ focused }) => (
             <CircleTabIcon name="home" focused={focused} tint={Colors[scheme].tint} inactive={Colors[scheme].tabIconDefault} />
           ),
           title: 'Home',
@@ -73,7 +73,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="map"
         options={{
-          tabBarIcon: ({ focused, color }) => (
+          tabBarIcon: ({ focused }) => (
             <CircleTabIcon name="map-o" focused={focused} tint={Colors[scheme].tint} inactive={Colors[scheme].tabIconDefault} />
           ),
           title: 'Map',
@@ -83,7 +83,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          tabBarIcon: ({ focused, color }) => (
+          tabBarIcon: ({ focused }) => (
             <CircleTabIcon name="cog" focused={focused} tint={Colors[scheme].tint} inactive={Colors[scheme].tabIconDefault} />
           ),
           title: 'Settings',

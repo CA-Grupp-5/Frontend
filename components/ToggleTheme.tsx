@@ -1,3 +1,4 @@
+/* global ColorSchemeSystem:false */
 import { MaterialIcons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 
@@ -26,7 +27,7 @@ export default function ToggleTheme({ colorScheme, setColorScheme, theme }: Prop
     <Pressable
       style={{
         alignItems: 'center',
-backgroundColor: colorScheme === 'light' ? Palette.white : Palette.neutral800, // Replace dark:bg-neutral-900
+        backgroundColor: colorScheme === 'light' ? Palette.white : Palette.neutral800, 
         flexDirection: 'row',
         height: 56, // Equivalent to h-14
         justifyContent: 'space-between',
