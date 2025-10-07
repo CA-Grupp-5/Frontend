@@ -79,7 +79,7 @@ jobs:
           fi
 
           for attempt in 1 2 3; do
-            if ./gradlew --no-daemon "$task" --stacktrace; then
+            if ./gradlew --no-daemon --build-cache "$task" --stacktrace; then
               break
             elif [ "$attempt" -lt 3 ]; then
               echo "Gradle build failed (attempt $attempt). Retrying in 15 seconds..."
