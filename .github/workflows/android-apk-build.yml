@@ -35,6 +35,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v2
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -54,15 +57,11 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Cache Gradle
-        uses: actions/cache@v4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('android/gradle/wrapper/gradle-wrapper.properties', 'android/build.gradle', 'android/app/build.gradle') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          build-root-directory: android
+          cache-read-only: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == true }}
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
@@ -82,7 +81,7 @@ jobs:
           fi
 
           for attempt in 1 2 3; do
-            if ./gradlew --no-daemon clean "$task" --stacktrace; then
+            if ./gradlew --no-daemon "$task" --stacktrace; then
               break
             elif [ "$attempt" -lt 3 ]; then
               echo "Gradle build failed (attempt $attempt). Retrying in 15 seconds..."
