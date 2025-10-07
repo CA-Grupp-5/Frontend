@@ -17,4 +17,4 @@ NEXT
 
 linter (add to docs)
 bunx eslint . --ext .ts,.tsx,.js,.jsx
- ..
+ ....
