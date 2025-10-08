@@ -125,7 +125,7 @@ export function HistoryModal({
               {selectedId ?? ''}
             </Text>
           </View>
-          <Pressable onPress={onClose} hitSlop={15} style={{ padding: 6 }}>
+          <Pressable onPress={onClose} hitSlop={15} accessibilityRole="button" accessibilityLabel="Close history" style={{ padding: 6 }}>
             <FontAwesome name="close" size={24} color={text} />
           </Pressable>
         </View>
@@ -227,4 +227,3 @@ export function HistoryModal({
 }
 
 export default HistoryModal;
-

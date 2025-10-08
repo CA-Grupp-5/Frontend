@@ -210,7 +210,12 @@ export default function MapScreen() {
         )}
 
         <Mapbox.MarkerView coordinate={driver_position} anchor={{ x: 0.5, y: 0.5 }}>
-          <Pressable onPress={() => setSheetVisible(true)}>
+          <Pressable
+            onPress={() => setSheetVisible(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Open driver details"
+            hitSlop={10}
+          >
             <View
               style={{
                 width: 48,
@@ -255,6 +260,7 @@ export default function MapScreen() {
           onPress={() => setStyleIndex((prev) => (prev + 1) % STYLE_OPTIONS.length)}
           accessibilityRole="button"
           accessibilityLabel={`Map style: ${currentStyle.label}`}
+          hitSlop={10}
           style={{
             flexDirection: 'row',
             alignItems: 'center',

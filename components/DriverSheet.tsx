@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Dimensions, Image, Pressable, Text, View, type ImageSourcePropType } from 'react-native';
+import { Animated, Dimensions, Image, Pressable, Text, View, Linking, type ImageSourcePropType } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Colors, { Palette } from '@/constants/Colors';
@@ -98,7 +98,12 @@ const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.l
 
           {/* Actions */}
           <Pressable
-            onPress={() => {/* TODO: hook call action */}}
+            onPress={() => {
+              Linking.openURL('tel:+15555550123');
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Call driver"
+            hitSlop={10}
             style={{
               borderWidth: 1,
               borderColor: tint,
@@ -119,13 +124,16 @@ const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.l
               onClose();
               onOpenPackages?.();
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Open packages"
+            hitSlop={10}
             style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 16, flexDirection: 'row', gap: 8 }}
           >
             <FontAwesome name="cube" size={16} color={tint} />
             <Text style={{ color: scheme === 'dark' ? Palette.gray200 : Palette.gray900, fontWeight: '600' }}>Packages</Text>
           </Pressable>
-          <Pressable onPress={onClose} style={{ alignItems: 'center', paddingVertical: 16 }}>
-<Text style={{ color: scheme === 'dark' ? Palette.gray200 : Palette.gray900, fontWeight: '600' }}>Close</Text>
+          <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="Close driver sheet" hitSlop={10} style={{ alignItems: 'center', paddingVertical: 16 }}>
+            <Text style={{ color: scheme === 'dark' ? Palette.gray200 : Palette.gray900, fontWeight: '600' }}>Close</Text>
           </Pressable>
         </SafeAreaView>
       </Animated.View>

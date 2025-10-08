@@ -38,6 +38,10 @@ export default function ToggleTheme({ colorScheme, setColorScheme, theme }: Prop
           ? { borderTopLeftRadius: 20, borderTopRightRadius: 20 }
           : { borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }),
       }}
+      accessibilityRole="button"
+      accessibilityLabel={`Set theme to ${theme}`}
+      accessibilityState={{ selected: colorScheme === theme }}
+      hitSlop={10}
       onPress={async () => {
         setColorScheme(theme as 'light' | 'dark' | 'system');
       }}
