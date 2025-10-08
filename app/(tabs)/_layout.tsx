@@ -81,6 +81,16 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="scan"
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <CircleTabIcon name="qrcode" focused={focused} tint={Colors[scheme].tint} inactive={Colors[scheme].tabIconDefault} />
+          ),
+          title: 'Scan',
+        }}
+      />
+
+      <Tabs.Screen
         name="settings"
         options={{
           tabBarIcon: ({ focused }) => (
