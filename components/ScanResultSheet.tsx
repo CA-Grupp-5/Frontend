@@ -12,6 +12,8 @@ export type ScanResultPayload = {
   recipient?: string;
   address?: string;
   notes?: string;
+  temperatureC?: number;
+  humidity?: number;
   raw: string;
 };
 
@@ -43,6 +45,26 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
   const tint = Colors[scheme].tint;
   const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.lightCardBg), [scheme]);
   const muted = scheme === 'dark' ? Palette.gray400 : Palette.gray600;
+
+  const vitals = useMemo(() => {
+    const items: { label: string; value: string; icon: React.ComponentProps<typeof FontAwesome>['name'] }[] = [];
+    if (!payload) return items;
+    if (typeof payload.temperatureC === 'number' && Number.isFinite(payload.temperatureC)) {
+      items.push({
+        label: 'Temperature',
+        value: `${payload.temperatureC.toFixed(1)}°C`,
+        icon: 'thermometer-half',
+      });
+    }
+    if (typeof payload.humidity === 'number' && Number.isFinite(payload.humidity)) {
+      items.push({
+        label: 'Humidity',
+        value: `${payload.humidity.toFixed(0)}%`,
+        icon: 'tint',
+      });
+    }
+    return items;
+  }, [payload]);
 
   if (!display || !payload) return null;
 
@@ -119,6 +141,56 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
               </View>
             ) : null}
 
+            {vitals.length ? (
+              <View
+                style={{
+                  backgroundColor: cardBg,
+                  borderRadius: 16,
+                  padding: 16,
+                  borderWidth: 1,
+                  borderColor: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
+                  gap: 12,
+                }}
+              >
+                <Text style={{ color: muted, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Package Vitals</Text>
+                <View style={{ flexDirection: 'row', gap: 12 }}>
+                  {vitals.map((item) => (
+                    <View
+                      key={item.label}
+                      style={{
+                        flex: 1,
+                        backgroundColor: scheme === 'dark' ? Palette.darkCardBg : Palette.white,
+                        borderRadius: 14,
+                        paddingVertical: 12,
+                        paddingHorizontal: 14,
+                        borderWidth: 1,
+                        borderColor: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 10,
+                          backgroundColor: tint,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <FontAwesome name={item.icon} size={18} color={Palette.white} />
+                      </View>
+                      <Text style={{ color: muted, fontSize: 12 }}>{item.label}</Text>
+                      <Text style={{ color: text, fontWeight: '700', fontSize: 16 }}>
+                        {item.label === 'Temperature' ? item.value.replace(/\uFFFD+\uFFFD?C/g, '°C') : item.value}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            ) : null}
+
             {payload.notes ? (
               <View
                 style={{
@@ -174,19 +246,7 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
               </Pressable>
             </View>
 
-            <View
-              style={{
-                borderWidth: 1,
-                borderColor: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
-                borderRadius: 12,
-                padding: 12,
-              }}
-            >
-              <Text style={{ color: muted, fontSize: 12, marginBottom: 4 }}>Raw data</Text>
-              <Text style={{ color: text, fontFamily: 'monospace', fontSize: 13 }} numberOfLines={3}>
-                {payload.raw}
-              </Text>
-            </View>
+            {null}
           </View>
         </SafeAreaView>
       </Animated.View>

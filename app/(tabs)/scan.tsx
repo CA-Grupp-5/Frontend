@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
-import { CameraView, useCameraPermissions, type BarcodeScanningResult } from 'expo-camera';
+import { ActivityIndicator, Alert, Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { CameraView, useCameraPermissions, type BarcodeScanningResult, type CameraMountError } from 'expo-camera';
 import { useColorScheme } from 'nativewind';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -17,11 +17,25 @@ const parseScannedPayload = (raw: string): ParsedPayload => {
     const candidate = JSON.parse(raw);
     if (candidate && typeof candidate === 'object') {
       const normalized = candidate as Record<string, unknown>;
+      const temp =
+        typeof normalized.temperatureC === 'number'
+          ? normalized.temperatureC
+          : typeof normalized.temperature === 'number'
+          ? normalized.temperature
+          : undefined;
+      const humid =
+        typeof normalized.humidity === 'number'
+          ? normalized.humidity
+          : typeof normalized.rh === 'number'
+          ? normalized.rh
+          : undefined;
       return {
         packageId: String(normalized.packageId ?? normalized.id ?? ''),
         recipient: typeof normalized.recipient === 'string' ? normalized.recipient : typeof normalized.customer === 'string' ? normalized.customer : undefined,
         address: typeof normalized.address === 'string' ? normalized.address : typeof normalized.destination === 'string' ? normalized.destination : undefined,
         notes: typeof normalized.notes === 'string' ? normalized.notes : undefined,
+        temperatureC: temp as number | undefined,
+        humidity: humid as number | undefined,
         raw,
       };
     }
@@ -33,11 +47,14 @@ const parseScannedPayload = (raw: string): ParsedPayload => {
 
 export default function ScanScreen() {
   const { colorScheme } = useColorScheme();
-  const scheme = colorScheme ?? 'light';
+  const scheme = colorScheme ?? 'dark';
   const [permission, requestPermission] = useCameraPermissions();
+  const isFocused = useIsFocused();
   const [sheetVisible, setSheetVisible] = useState(false);
   const [result, setResult] = useState<ScanResultPayload | null>(null);
   const lastScannedRef = useRef<string | null>(null);
+  const [cameraReady, setCameraReady] = useState(false);
+  const [mountError, setMountError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!permission) {
@@ -47,15 +64,24 @@ export default function ScanScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      setMountError(null);
       setSheetVisible(false);
       setResult(null);
       lastScannedRef.current = null;
       return () => {
-        setSheetVisible(false);
-        lastScannedRef.current = null;
+        
       };
     }, [])
   );
+
+  // Ensure the result sheet never remains open when leaving the tab(prev edge case blocker)
+  useEffect(() => {
+    if (!isFocused && sheetVisible) {
+      setSheetVisible(false);
+      setResult(null);
+      lastScannedRef.current = null;
+    }
+  }, [isFocused, sheetVisible]);
 
   const handleBarcodeScanned = useCallback(
     (scan: BarcodeScanningResult) => {
@@ -77,22 +103,28 @@ export default function ScanScreen() {
     }, 220);
   }, []);
 
-  const handleMarkDelivered = useCallback((payload: ScanResultPayload | null) => {
-    setSheetVisible(false);
-    setTimeout(() => {
-      setResult(null);
-      lastScannedRef.current = null;
-    }, 220);
-    const packageLabel = payload?.packageId ? `Package ${payload.packageId}` : 'Package';
-    Alert.alert('Delivered', `${packageLabel} marked as delivered.`);
-  }, []);
+  const handleMarkDelivered = useCallback(
+    (payload: ScanResultPayload | null) => {
+      setSheetVisible(false);
+      setTimeout(() => {
+        setResult(null);
+        lastScannedRef.current = null;
+      }, 220);
+      const packageLabel = payload?.packageId ? `Package ${payload.packageId}` : 'Package';
+      Alert.alert('Delivered', `${packageLabel} marked as delivered.`);
+    },
+    []
+  );
 
-  const scanningActive = useMemo(() => Boolean(permission?.granted && !sheetVisible), [permission?.granted, sheetVisible]);
+  const scanningActive = useMemo(
+    () => Boolean(permission?.granted && !sheetVisible && cameraReady && !mountError && isFocused),
+    [permission?.granted, sheetVisible, cameraReady, mountError, isFocused]
+  );
 
   if (!permission) {
     return (
       <View style={[styles.centered, { backgroundColor: Colors[scheme].background }]}>
-        <Text style={{ color: Colors[scheme].text, fontSize: 16 }}>Preparing camera…</Text>
+        <Text style={{ color: Colors[scheme].text, fontSize: 16 }}>Preparing camera...</Text>
       </View>
     );
   }
@@ -124,18 +156,29 @@ export default function ScanScreen() {
 
   return (
     <View style={styles.root}>
+      <StatusBar barStyle="light-content" />
+
       <CameraView
-        style={StyleSheet.absoluteFill}
+        style={StyleSheet.absoluteFillObject}
         facing="back"
         barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+        active={isFocused && !sheetVisible && !mountError}
         onBarcodeScanned={scanningActive ? handleBarcodeScanned : undefined}
+        onCameraReady={() => {
+          setCameraReady(true);
+          setMountError(null);
+        }}
+        onMountError={(error: CameraMountError) => {
+          setMountError(error?.message ?? 'Unable to start camera');
+          setCameraReady(false);
+        }}
       />
 
       <SafeAreaView style={styles.overlay} pointerEvents="box-none">
         <View style={[styles.header, { marginTop: 24 }]}>
           <Text style={{ color: Palette.white, fontSize: 24, fontWeight: '800' }}>Scan package QR</Text>
           <Text style={{ color: Palette.gray300, fontSize: 14, marginTop: 6 }}>
-            Align the code inside the frame to capture delivery details.
+            Align the code inside the frame until details appear.
           </Text>
         </View>
 
@@ -147,11 +190,37 @@ export default function ScanScreen() {
           <View style={styles.tip}>
             <FontAwesome name="lightbulb-o" size={16} color={Palette.white} />
             <Text style={{ color: Palette.white, fontSize: 13, marginLeft: 8 }}>
-              Need to rescan? Close the card after reviewing details.
+              Close the sheet to resume scanning another code.
             </Text>
           </View>
         </View>
       </SafeAreaView>
+
+      {!cameraReady && !mountError ? (
+        <View style={styles.loadingCover} pointerEvents="none">
+          <ActivityIndicator size="large" color={Palette.white} />
+          <Text style={{ color: Palette.white, marginTop: 12, fontWeight: '600' }}>Initializing camera...</Text>
+        </View>
+      ) : null}
+
+      {mountError ? (
+        <View style={styles.loadingCover}>
+          <FontAwesome name="exclamation-triangle" size={28} color={Palette.white} />
+          <Text style={{ color: Palette.white, marginTop: 12, textAlign: 'center', fontSize: 16, fontWeight: '700' }}>
+            Camera unavailable
+          </Text>
+          <Text style={{ color: Palette.gray300, marginTop: 6, textAlign: 'center' }}>{mountError}</Text>
+          <Pressable
+            onPress={() => {
+              setMountError(null);
+              setCameraReady(false);
+            }}
+            style={{ marginTop: 16, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 999, backgroundColor: Colors[scheme].tint }}
+          >
+            <Text style={{ color: Palette.white, fontWeight: '600' }}>Try again</Text>
+          </Pressable>
+        </View>
+      ) : null}
 
       <ScanResultSheet visible={sheetVisible} payload={result} onClose={handleCloseSheet} onMarkDelivered={handleMarkDelivered} />
     </View>
@@ -184,11 +253,12 @@ const styles = StyleSheet.create({
   },
   frame: {
     width: '70%',
+    maxWidth: 320,
     aspectRatio: 1,
     borderRadius: 24,
     borderWidth: 2,
     borderColor: Palette.white,
-    backgroundColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: 'rgba(0,0,0,0.12)',
   },
   footer: {
     alignItems: 'center',
@@ -200,5 +270,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 16,
     backgroundColor: 'rgba(0,0,0,0.35)',
+  },
+  loadingCover: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    paddingHorizontal: 24,
   },
 });

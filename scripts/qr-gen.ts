@@ -10,6 +10,8 @@ type CliOptions = {
   address?: string;
   notes?: string;
   out?: string;
+  temperatureC?: number;
+  humidity?: number;
 };
 
 const parseArgs = (): CliOptions => {
@@ -34,6 +36,12 @@ const parseArgs = (): CliOptions => {
       case '--notes':
         opts.notes = value;
         break;
+      case '--temperature':
+        opts.temperatureC = value ? Number.parseFloat(value) : undefined;
+        break;
+      case '--humidity':
+        opts.humidity = value ? Number.parseFloat(value) : undefined;
+        break;
       case '--out':
         opts.out = value;
         break;
@@ -44,25 +52,23 @@ const parseArgs = (): CliOptions => {
   return opts;
 };
 
-const usage = () => {
-  console.log('Usage: bun scripts/generate-package-qr.ts --id PKG123 [--recipient "John Doe"] [--address "123 Main St"] [--notes "Leave at door"] [--out path/to/file.png]');
+const randomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+const randomFloat = (min: number, max: number, precision = 1) => {
+  const factor = 10 ** precision;
+  return Math.round((Math.random() * (max - min) + min) * factor) / factor;
 };
 
 const main = async () => {
-  const { id, recipient, address, notes, out } = parseArgs();
+  const { id, recipient, address, notes, temperatureC, humidity, out } = parseArgs();
 
-  if (!id) {
-    console.error('Missing required --id option.\n');
-    usage();
-    process.exit(1);
-    return;
-  }
-
+  const packageId = id ?? `PKG${String(randomInt(1, 50)).padStart(3, '0')}`;
   const payload = {
-    packageId: id,
+    packageId,
     recipient,
     address,
     notes,
+    temperatureC: typeof temperatureC === 'number' && Number.isFinite(temperatureC) ? temperatureC : randomFloat(4, 10),
+    humidity: typeof humidity === 'number' && Number.isFinite(humidity) ? humidity : randomInt(40, 80),
     generatedAt: new Date().toISOString(),
   };
 
