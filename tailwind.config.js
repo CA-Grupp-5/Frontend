@@ -81,6 +81,8 @@ module.exports = {
           amber: {
             500: 'hsl(38, 92%, 50%)',
           },
+          success: 'hsl(142, 71%, 45%)',
+          destructive: 'hsl(0, 84%, 60%)',
           
           // Map marker
           'marker-truck': 'hsl(189, 78%, 37%)',

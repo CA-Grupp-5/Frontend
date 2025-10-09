@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Dimensions, Image, Pressable, Text, View, Linking, type ImageSourcePropType } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Dimensions, Image, Pressable, Text, View, Linking, type ImageSourcePropType } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import Colors, { Palette } from '@/constants/Colors';
 import { useColorScheme } from 'nativewind';
-// Navigation not needed here; parent controls packages modal
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -21,18 +21,22 @@ export default function DriverSheet({ visible, onClose, driver, onOpenPackages }
   const { colorScheme } = useColorScheme();
   const scheme = colorScheme ?? 'dark';
   const [open, setOpen] = useState(visible);
-  const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const translateY = useSharedValue(SCREEN_HEIGHT);
 
   useEffect(() => {
     if (visible) {
       setOpen(true);
-      Animated.timing(translateY, { toValue: 0, duration: 240, useNativeDriver: true }).start();
+      translateY.value = withTiming(0, { duration: 250, easing: Easing.inOut(Easing.ease) });
     } else {
-      Animated.timing(translateY, { toValue: SCREEN_HEIGHT, duration: 200, useNativeDriver: true }).start(({ finished }) => {
-        if (finished) setOpen(false);
+      translateY.value = withTiming(SCREEN_HEIGHT, { duration: 250, easing: Easing.inOut(Easing.ease) }, (finished) => {
+        if (finished) runOnJS(setOpen)(false);
       });
     }
   }, [visible, translateY]);
+
+  const sheetStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
 
 const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.lightCardBg), [scheme]);
   const text = Colors[scheme].text;
@@ -47,13 +51,15 @@ const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.l
 
       {/* Sheet */}
       <Animated.View
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          transform: [{ translateY }],
-        }}
+        style={[
+          {
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+          },
+          sheetStyle,
+        ]}
       >
         <SafeAreaView edges={['bottom']} style={{ backgroundColor: Colors[scheme].tabBarBackground, paddingHorizontal: 16, paddingTop: 8, borderTopLeftRadius: 24, borderTopRightRadius: 24 }}>
           {/* Grabber */}

@@ -1,10 +1,17 @@
 import React, { useCallback, useMemo } from 'react';
-import { FlatList, Modal, Pressable, Text, View } from 'react-native';
+import { FlatList, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import Colors, { Palette } from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import HistoryModal from './HistoryModal';
+import Animated, {
+  runOnJS,
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 type ViewMode = 'grid' | 'card' | 'list';
 
@@ -193,6 +200,14 @@ const SAMPLE_PACKAGES: PackageItem[] = Array.from({ length: 50 }, (_, i) => {
   return { id, status, temperature, humidity };
 });
 
+const MODE_TO_INDEX = Object.freeze<Record<ViewMode, number>>({
+  grid: 0,
+  card: 1,
+  list: 2,
+});
+
+const INDEX_TO_MODE: ViewMode[] = ['grid', 'card', 'list'];
+
 export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { colorScheme } = useColorScheme();
   const scheme = colorScheme ?? 'light';
@@ -202,6 +217,7 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   const [mode, setMode] = React.useState<ViewMode>('grid');
   const [historyOpen, setHistoryOpen] = React.useState(false);
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [interactiveMode, setInteractiveMode] = React.useState<ViewMode>('grid');
 
   const success = 'hsl(142, 71%, 45%)';
   const destructive = 'hsl(0, 84%, 60%)';
@@ -236,6 +252,47 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
     ({ item }: { item: PackageItem }) => <ListItem item={item} colors={colors} onHistory={onHistory} />,
     [colors, onHistory]
   );
+
+  const modeProgress = useSharedValue(MODE_TO_INDEX[mode]);
+
+  React.useEffect(() => {
+    modeProgress.value = withTiming(MODE_TO_INDEX[mode], { duration: 220 });
+  }, [mode, modeProgress]);
+
+  const updateInteractiveMode = useCallback((nextMode: ViewMode) => {
+    setInteractiveMode((current) => (current === nextMode ? current : nextMode));
+  }, []);
+
+  useAnimatedReaction(
+    () => modeProgress.value,
+    (value) => {
+      'worklet';
+      const nearestIndex = Math.round(value);
+      const difference = Math.abs(value - nearestIndex);
+      if (difference < 0.05) {
+        const nextMode = INDEX_TO_MODE[nearestIndex];
+        if (nextMode) {
+          runOnJS(updateInteractiveMode)(nextMode);
+        }
+      }
+    },
+    [updateInteractiveMode]
+  );
+
+  const gridAnimatedStyle = useAnimatedStyle(() => {
+    const distance = Math.abs(modeProgress.value - MODE_TO_INDEX.grid);
+    return { opacity: 1 - Math.min(distance, 1) };
+  });
+
+  const cardAnimatedStyle = useAnimatedStyle(() => {
+    const distance = Math.abs(modeProgress.value - MODE_TO_INDEX.card);
+    return { opacity: 1 - Math.min(distance, 1) };
+  });
+
+  const listAnimatedStyle = useAnimatedStyle(() => {
+    const distance = Math.abs(modeProgress.value - MODE_TO_INDEX.list);
+    return { opacity: 1 - Math.min(distance, 1) };
+  });
 
   return (
     <Modal visible={isOpen} transparent animationType="fade" onRequestClose={onClose}>
@@ -317,48 +374,59 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
             </View>
 
             {/* Content */}
-            {mode === 'grid' && (
-              <FlatList
-                data={SAMPLE_PACKAGES}
-                key={'grid'}
-                numColumns={2}
-                contentContainerStyle={{ padding: 12, gap: 12 }}
-                columnWrapperStyle={{ gap: 12 }}
-                initialNumToRender={12}
-                windowSize={5}
-                removeClippedSubviews
-                keyExtractor={(item) => item.id}
-                renderItem={renderGridItem}
-              />
-            )}
+            <View style={{ flex: 1, position: 'relative' }}>
+              <Animated.View
+                pointerEvents={interactiveMode === 'grid' ? 'auto' : 'none'}
+                style={[StyleSheet.absoluteFillObject, gridAnimatedStyle]}
+              >
+                <FlatList
+                  data={SAMPLE_PACKAGES}
+                  key={'grid'}
+                  numColumns={2}
+                  contentContainerStyle={{ padding: 12, gap: 12 }}
+                  columnWrapperStyle={{ gap: 12 }}
+                  initialNumToRender={12}
+                  windowSize={5}
+                  removeClippedSubviews
+                  keyExtractor={(item) => item.id}
+                  renderItem={renderGridItem}
+                />
+              </Animated.View>
 
-            {mode === 'card' && (
-              <FlatList
-                data={SAMPLE_PACKAGES}
-                key={'card'}
-                contentContainerStyle={{ padding: 12, gap: 12 }}
-                ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-                initialNumToRender={10}
-                windowSize={5}
-                removeClippedSubviews
-                keyExtractor={(item) => item.id}
-                renderItem={renderCardItem}
-              />
-            )}
+              <Animated.View
+                pointerEvents={interactiveMode === 'card' ? 'auto' : 'none'}
+                style={[StyleSheet.absoluteFillObject, cardAnimatedStyle]}
+              >
+                <FlatList
+                  data={SAMPLE_PACKAGES}
+                  key={'card'}
+                  contentContainerStyle={{ padding: 12, gap: 12 }}
+                  ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+                  initialNumToRender={10}
+                  windowSize={5}
+                  removeClippedSubviews
+                  keyExtractor={(item) => item.id}
+                  renderItem={renderCardItem}
+                />
+              </Animated.View>
 
-            {mode === 'list' && (
-              <FlatList
-                data={SAMPLE_PACKAGES}
-                key={'list'}
-                contentContainerStyle={{ paddingHorizontal: 6 }}
-                initialNumToRender={20}
-                windowSize={7}
-                removeClippedSubviews
-                getItemLayout={(_data, index) => ({ length: 72, offset: 72 * index, index })}
-                keyExtractor={(item) => item.id}
-                renderItem={renderListItem}
-              />
-            )}
+              <Animated.View
+                pointerEvents={interactiveMode === 'list' ? 'auto' : 'none'}
+                style={[StyleSheet.absoluteFillObject, listAnimatedStyle]}
+              >
+                <FlatList
+                  data={SAMPLE_PACKAGES}
+                  key={'list'}
+                  contentContainerStyle={{ paddingHorizontal: 6 }}
+                  initialNumToRender={20}
+                  windowSize={7}
+                  removeClippedSubviews
+                  getItemLayout={(_data, index) => ({ length: 72, offset: 72 * index, index })}
+                  keyExtractor={(item) => item.id}
+                  renderItem={renderListItem}
+                />
+              </Animated.View>
+            </View>
           </View>
         </SafeAreaView>
       </View>
