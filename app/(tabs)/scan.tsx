@@ -21,18 +21,28 @@ const parseScannedPayload = (raw: string): ParsedPayload => {
         typeof normalized.temperatureC === 'number'
           ? normalized.temperatureC
           : typeof normalized.temperature === 'number'
-          ? normalized.temperature
-          : undefined;
+            ? normalized.temperature
+            : undefined;
       const humid =
         typeof normalized.humidity === 'number'
           ? normalized.humidity
           : typeof normalized.rh === 'number'
-          ? normalized.rh
-          : undefined;
+            ? normalized.rh
+            : undefined;
       return {
         packageId: String(normalized.packageId ?? normalized.id ?? ''),
-        recipient: typeof normalized.recipient === 'string' ? normalized.recipient : typeof normalized.customer === 'string' ? normalized.customer : undefined,
-        address: typeof normalized.address === 'string' ? normalized.address : typeof normalized.destination === 'string' ? normalized.destination : undefined,
+        recipient:
+          typeof normalized.recipient === 'string'
+            ? normalized.recipient
+            : typeof normalized.customer === 'string'
+              ? normalized.customer
+              : undefined,
+        address:
+          typeof normalized.address === 'string'
+            ? normalized.address
+            : typeof normalized.destination === 'string'
+              ? normalized.destination
+              : undefined,
         notes: typeof normalized.notes === 'string' ? normalized.notes : undefined,
         temperatureC: temp as number | undefined,
         humidity: humid as number | undefined,
@@ -68,10 +78,8 @@ export default function ScanScreen() {
       setSheetVisible(false);
       setResult(null);
       lastScannedRef.current = null;
-      return () => {
-        
-      };
-    }, [])
+      return () => {};
+    }, []),
   );
 
   // Ensure the result sheet never remains open when leaving the tab(prev edge case blocker)
@@ -92,7 +100,7 @@ export default function ScanScreen() {
       setResult(parsed);
       setSheetVisible(true);
     },
-    [sheetVisible]
+    [sheetVisible],
   );
 
   const handleCloseSheet = useCallback(() => {
@@ -103,22 +111,19 @@ export default function ScanScreen() {
     }, 220);
   }, []);
 
-  const handleMarkDelivered = useCallback(
-    (payload: ScanResultPayload | null) => {
-      setSheetVisible(false);
-      setTimeout(() => {
-        setResult(null);
-        lastScannedRef.current = null;
-      }, 220);
-      const packageLabel = payload?.packageId ? `Package ${payload.packageId}` : 'Package';
-      Alert.alert('Delivered', `${packageLabel} marked as delivered.`);
-    },
-    []
-  );
+  const handleMarkDelivered = useCallback((payload: ScanResultPayload | null) => {
+    setSheetVisible(false);
+    setTimeout(() => {
+      setResult(null);
+      lastScannedRef.current = null;
+    }, 220);
+    const packageLabel = payload?.packageId ? `Package ${payload.packageId}` : 'Package';
+    Alert.alert('Delivered', `${packageLabel} marked as delivered.`);
+  }, []);
 
   const scanningActive = useMemo(
     () => Boolean(permission?.granted && !sheetVisible && cameraReady && !mountError && isFocused),
-    [permission?.granted, sheetVisible, cameraReady, mountError, isFocused]
+    [permission?.granted, sheetVisible, cameraReady, mountError, isFocused],
   );
 
   if (!permission) {
@@ -133,10 +138,18 @@ export default function ScanScreen() {
     return (
       <View style={[styles.centered, { backgroundColor: Colors[scheme].background, paddingHorizontal: 24 }]}>
         <FontAwesome name="camera" size={48} color={Colors[scheme].tint} style={{ marginBottom: 16 }} />
-        <Text style={{ color: Colors[scheme].text, fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 8 }}>
+        <Text
+          style={{ color: Colors[scheme].text, fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 8 }}
+        >
           Camera access needed
         </Text>
-        <Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, textAlign: 'center', marginBottom: 18 }}>
+        <Text
+          style={{
+            color: scheme === 'dark' ? Palette.gray400 : Palette.gray600,
+            textAlign: 'center',
+            marginBottom: 18,
+          }}
+        >
           Allow camera permissions to scan package QR codes.
         </Text>
         <Pressable
@@ -177,9 +190,9 @@ export default function ScanScreen() {
       <SafeAreaView style={styles.overlay} pointerEvents="box-none">
         <View style={[styles.header, { marginTop: 24 }]}>
           <Text style={{ color: Palette.white, fontSize: 24, fontWeight: '800' }}>Scan package QR</Text>
-          <Text style={{ color: Palette.gray300, fontSize: 14, marginTop: 6 }}>
+          {/* <Text style={{ color: Palette.gray300, fontSize: 14, marginTop: 6 }}>
             Align the code inside the frame until details appear.
-          </Text>
+          </Text> */}
         </View>
 
         <View style={styles.frameContainer} pointerEvents="none">
@@ -190,7 +203,7 @@ export default function ScanScreen() {
           <View style={styles.tip}>
             <FontAwesome name="lightbulb-o" size={16} color={Palette.white} />
             <Text style={{ color: Palette.white, fontSize: 13, marginLeft: 8 }}>
-              Close the sheet to resume scanning another code.
+              Align the code inside the frame until details appear.
             </Text>
           </View>
         </View>
@@ -215,14 +228,25 @@ export default function ScanScreen() {
               setMountError(null);
               setCameraReady(false);
             }}
-            style={{ marginTop: 16, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 999, backgroundColor: Colors[scheme].tint }}
+            style={{
+              marginTop: 16,
+              paddingHorizontal: 20,
+              paddingVertical: 10,
+              borderRadius: 999,
+              backgroundColor: Colors[scheme].tint,
+            }}
           >
             <Text style={{ color: Palette.white, fontWeight: '600' }}>Try again</Text>
           </Pressable>
         </View>
       ) : null}
 
-      <ScanResultSheet visible={sheetVisible} payload={result} onClose={handleCloseSheet} onMarkDelivered={handleMarkDelivered} />
+      <ScanResultSheet
+        visible={sheetVisible}
+        payload={result}
+        onClose={handleCloseSheet}
+        onMarkDelivered={handleMarkDelivered}
+      />
     </View>
   );
 }
@@ -244,7 +268,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   header: {
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   frameContainer: {
     flex: 1,
