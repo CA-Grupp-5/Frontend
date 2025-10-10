@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
@@ -199,9 +199,9 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   const text = Colors[scheme].text;
   const tint = Colors[scheme].tint;
 
-  const [mode, setMode] = React.useState<ViewMode>('grid');
-  const [historyOpen, setHistoryOpen] = React.useState(false);
-  const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [mode, setMode] = useState<ViewMode>('grid');
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const success = 'hsl(142, 71%, 45%)';
   const destructive = 'hsl(0, 84%, 60%)';

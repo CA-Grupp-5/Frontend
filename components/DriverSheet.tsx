@@ -4,7 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Colors, { Palette } from '@/constants/Colors';
 import { useColorScheme } from 'nativewind';
-// Navigation not needed here; parent controls packages modal
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -99,7 +98,7 @@ const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.l
           {/* Actions */}
           <Pressable
             onPress={() => {
-              Linking.openURL('tel:+15555550123');
+              Linking.openURL('tel:+15555550123');//remember to change this to real phone number when we have it
             }}
             accessibilityRole="button"
             accessibilityLabel="Call driver"

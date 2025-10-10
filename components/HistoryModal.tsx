@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
@@ -23,7 +23,7 @@ export function HistoryModal({
   const destructive = 'hsl(0, 84%, 60%)';
 
   const hours = 72;
-  const data = React.useMemo(() => {
+  const data = useMemo(() => {
     if (!visible) return [] as { hour: number; temperature: number; humidity: number }[];
     return Array.from({ length: hours }, (_, i) => {
       const tempBase = 22;
@@ -34,15 +34,15 @@ export function HistoryModal({
     });
   }, [visible]);
 
-  const avgTemp = React.useMemo(
+  const avgTemp = useMemo(
     () => (data.length ? (data.reduce((s, d) => s + d.temperature, 0) / data.length).toFixed(1) : '0.0'),
     [data]
   );
-  const avgHum = React.useMemo(
+  const avgHum = useMemo(
     () => (data.length ? (data.reduce((s, d) => s + d.humidity, 0) / data.length).toFixed(0) : '0'),
     [data]
   );
-  const alertCount = React.useMemo(
+  const alertCount = useMemo(
     () => data.filter((d) => d.temperature > 25 || d.temperature < 19 || d.humidity > 60 || d.humidity < 45).length,
     [data]
   );

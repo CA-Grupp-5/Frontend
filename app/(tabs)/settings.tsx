@@ -23,7 +23,7 @@ export default function TabTwoScreen() {
 
       {/* Basic red logout button for testing */}
       <TouchableOpacity
-        className="mt-6 bg-red-600 px-6 py-3 rounded flex-row items-center justify-center"
+        className="mt-6 bg-red-600 px-8 py-3 flex-row items-center justify-center rounded-xl"
         onPress={() => logout()}
         accessibilityLabel="Logout"
       >

@@ -1,4 +1,4 @@
-const tintColor = 'hsl(200, 90%, 55%)'; // Approximate of oklch(0.65 0.15 195)
+const tintColor = 'hsl(200, 90%, 55%)'; 
 
 export type ThemeName = 'light' | 'dark';
 

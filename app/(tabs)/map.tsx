@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, useCallback } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback, useState } from 'react';
 import { Pressable, View, Text } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -40,15 +40,15 @@ const expandBoundsAround = (center: Coordinate, dLon: number, dLat: number) => {
 export default function MapScreen() {
   const cameraRef = useRef<Mapbox.Camera>(null);
   const routeBoundsAppliedRef = useRef(false);
-  const [mapReady, setMapReady] = React.useState(false);
+  const [mapReady, setMapReady] = useState(false);
   const { colorScheme } = useColorScheme();
   const tint = Colors[colorScheme ?? 'light'].tint;
   const isDark = (colorScheme ?? 'light') === 'dark';
-  const [sheetVisible, setSheetVisible] = React.useState(false);
-  const [packagesVisible, setPackagesVisible] = React.useState(false);
+  const [sheetVisible, setSheetVisible] = useState(false);
+  const [packagesVisible, setPackagesVisible] = useState(false);
 
   
-  const STYLE_OPTIONS = React.useMemo(
+  const STYLE_OPTIONS = useMemo(
     () => [
       { key: 'dark', label: 'Dark', url: Mapbox.StyleURL.Dark },
       { key: 'light', label: 'Light', url: Mapbox.StyleURL.Street },
@@ -57,18 +57,18 @@ export default function MapScreen() {
     ],
     []
   );
-  const [styleIndex, setStyleIndex] = React.useState(0);
+  const [styleIndex, setStyleIndex] = useState(0);
   const currentStyle = STYLE_OPTIONS[styleIndex];
   
   const driver_position = useMemo<Coordinate>(() => [18.0686, 59.3293], []);
   // const INITIAL_DESTINATION: Coordinate = [18.0911, 59.2934];
   const HOME_ADDRESS = 'Sveavagen 168, 113 46 Stockholm, Sweden' as const;
-  const [home, setHome] = React.useState<Coordinate | null>(null);
+  const [home, setHome] = useState<Coordinate | null>(null);
 
-  const [routeGeom, setRouteGeom] = React.useState<any | null>(null);
-  const [eta, setEta] = React.useState<string>('');
+  const [routeGeom, setRouteGeom] = useState<any | null>(null);
+  const [eta, setEta] = useState<string>('');
 
-  const driver = React.useMemo(
+  const driver = useMemo(
     () => ({
       name: 'Marcus Johnson',
       role: 'Your delivery driver',
