@@ -3,10 +3,10 @@ name: Android APK Builds
 on:
   push:
     branches:
-      - feature-qr
+      - '**'
   pull_request:
     branches:
-      - feature-qr
+      - '**'
   workflow_dispatch:
 
 jobs:
