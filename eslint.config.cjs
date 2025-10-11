@@ -89,6 +89,20 @@ module.exports = [
     },
     rules: { 'no-undef': 'off' },
   },
+  {
+    files: ['**/*.test.{js,jsx,ts,tsx}', 'jest.setup.js', 'jest.setup.ts'],
+    languageOptions: {
+      parser: tsParser,
+    parserOptions: { ecmaFeatures: { jsx: true } },
+      globals: {
+        ...globals.jest,
+      },
+    },
+    
+    rules: {
+      'no-undef': 'off',
+    },
+  },
 
   // Turn off stylistic conflicts with Prettier
   prettier,
