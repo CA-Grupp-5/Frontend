@@ -42,7 +42,7 @@ export const Palette = {
   darkTabBorder: 'hsl(222, 47%, 11%)', // #0f172a
 } as const;
 
-const Colors: Record<ThemeName, {
+interface ThemeColors  {
   text: string;
   background: string;
   tint: string;
@@ -50,7 +50,9 @@ const Colors: Record<ThemeName, {
   tabIconSelected: string;
   tabBarBackground: string;
   tabBarBorder: string;
-}> = {
+}
+
+const Colors: Record<ThemeName, ThemeColors>= {
   light: {
     text: Palette.gray900,
     background: Palette.white,

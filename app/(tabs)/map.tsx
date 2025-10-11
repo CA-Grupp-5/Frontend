@@ -1,41 +1,18 @@
 import React, { useRef, useEffect, useMemo, useCallback, useState } from 'react';
-import { Pressable, View, Text } from 'react-native';
+import { Pressable, View } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import DriverSheet from '@/components/DriverSheet';
 import { PackagesModal } from '@/components/PackagesModal';
-import Colors, { Palette } from '@/constants/Colors';
+import Colors from '@/constants/Colors';
 import Constants from 'expo-constants';
-import { geocodeAddress } from '@/lib/mapbox';
+import { geocodeAddress, type LngLat } from '@/lib/mapbox';
+import { computeBoundsFromRoute, expandBoundsAround } from '@/lib/map-geometry';
+import MapStyleToggle from '@/components/MapStyleToggle';
 
 const BOUNDS_PADDING = 48;
-
-type Coordinate = [number, number];
-
-
-
-const computeBoundsFromRoute = (routeGeom: any) => {
-  const coords = (routeGeom?.coordinates ?? []) as Coordinate[];
-  if (!Array.isArray(coords) || coords.length < 2) return null;
-
-  const longitudes = coords.map(([lon]) => lon);
-  const latitudes = coords.map(([, lat]) => lat);
-
-  return {
-    ne: [Math.max(...longitudes), Math.max(...latitudes)] as Coordinate,
-    sw: [Math.min(...longitudes), Math.min(...latitudes)] as Coordinate,
-  };
-};
-
-const expandBoundsAround = (center: Coordinate, dLon: number, dLat: number) => {
-  const [lon, lat] = center;
-  return {
-    ne: [lon + dLon, lat + dLat] as Coordinate,
-    sw: [lon - dLon, lat - dLat] as Coordinate,
-  };
-};
 
 export default function MapScreen() {
   const cameraRef = useRef<Mapbox.Camera>(null);
@@ -43,7 +20,6 @@ export default function MapScreen() {
   const [mapReady, setMapReady] = useState(false);
   const { colorScheme } = useColorScheme();
   const tint = Colors[colorScheme ?? 'light'].tint;
-  const isDark = (colorScheme ?? 'light') === 'dark';
   const [sheetVisible, setSheetVisible] = useState(false);
   const [packagesVisible, setPackagesVisible] = useState(false);
 
@@ -60,10 +36,10 @@ export default function MapScreen() {
   const [styleIndex, setStyleIndex] = useState(0);
   const currentStyle = STYLE_OPTIONS[styleIndex];
   
-  const driver_position = useMemo<Coordinate>(() => [18.0686, 59.3293], []);
+  const driver_position = useMemo<LngLat>(() => [18.0686, 59.3293], []);
   // const INITIAL_DESTINATION: Coordinate = [18.0911, 59.2934];
   const HOME_ADDRESS = 'Sveavagen 168, 113 46 Stockholm, Sweden' as const;
-  const [home, setHome] = useState<Coordinate | null>(null);
+  const [home, setHome] = useState<LngLat | null>(null);
 
   const [routeGeom, setRouteGeom] = useState<any | null>(null);
   const [eta, setEta] = useState<string>('');
@@ -82,7 +58,7 @@ export default function MapScreen() {
 
   const defaultBounds = useMemo(() => expandBoundsAround(driver_position, 0.12, 0.08), [driver_position]);
 
-  const fitBounds = useCallback((bounds: { ne: Coordinate; sw: Coordinate }, duration: number) => {
+  const fitBounds = useCallback((bounds: { ne: LngLat; sw: LngLat }, duration: number) => {
     requestAnimationFrame(() => {
       cameraRef.current?.setCamera({
         bounds: {
@@ -108,7 +84,7 @@ export default function MapScreen() {
     if (!HOME_ADDRESS) return;
     geocodeAddress(HOME_ADDRESS, { country: 'SE', proximity: driver_position, limit: 5 })
       .then((feature) => {
-        if (feature?.center) setHome(feature.center as Coordinate);
+        if (feature?.center) setHome(feature.center as LngLat);
       })
       .catch(() => {});
   }, [driver_position]);
@@ -251,39 +227,12 @@ export default function MapScreen() {
         )}
       </Mapbox.MapView>
 
-      {/* Map style toggle */}
-      <View
-        style={{ position: 'absolute', right: 16, bottom: 16, zIndex: 10 }}
-        pointerEvents="box-none"
-      >
-        <Pressable
+      
+        <MapStyleToggle
+          label={currentStyle.label}
+          tint={tint}
           onPress={() => setStyleIndex((prev) => (prev + 1) % STYLE_OPTIONS.length)}
-          accessibilityRole="button"
-          accessibilityLabel={`Map style: ${currentStyle.label}`}
-          hitSlop={10}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-            borderRadius: 22,
-            backgroundColor: isDark ? Palette.darkCardBg : Palette.lightCardBg,
-            borderWidth: 1,
-            borderColor: Colors[colorScheme ?? 'light'].tabBarBorder,
-            gap: 8,
-            shadowColor: '#000',
-            shadowOpacity: 0.15,
-            shadowRadius: 6,
-            shadowOffset: { width: 0, height: 2 },
-            elevation: 3,
-          }}
-        >
-          <FontAwesome name="map" size={16} color={tint} />
-          <Text style={{ color: Colors[colorScheme ?? 'light'].text, fontWeight: '600' }}>
-            {currentStyle.label}
-          </Text>
-        </Pressable>
-      </View>
+        />
 
       <DriverSheet
         visible={sheetVisible}

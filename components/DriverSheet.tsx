@@ -7,7 +7,7 @@ import { useColorScheme } from 'nativewind';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
-export type DriverInfo = {
+export interface DriverInfo {
   name: string;
   rating: number;
   role: string;
