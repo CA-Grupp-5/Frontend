@@ -28,8 +28,9 @@ export const Palette = {
   // Accents
   amber500: 'hsl(38, 92%, 50%)', // #f59e0b
 
-  // Map marker color used in Map screen
-  markerTruck: 'hsl(189, 78%, 37%)', // #1590a6
+  // Status (used across multiple components)
+  success: 'hsl(142, 71%, 45%)',
+  destructive: 'hsl(0, 84%, 60%)',
 
   // Overlay
   backdropOverlay: 'hsla(0, 0%, 0%, 0.5)', // rgba(0,0,0,0.5)
@@ -50,8 +51,13 @@ interface ThemeColors  {
   tabIconSelected: string;
   tabBarBackground: string;
   tabBarBorder: string;
+  // Common semantics used in multiple places
+  mutedText: string; // subdued text (labels, hints)
+  border: string;    // card borders
+  divider: string;   // list row separators
+  surface: string;   // card surfaces
 }
-
+// Mapping of theme names to colors to avoid calculating colors in the individual components
 const Colors: Record<ThemeName, ThemeColors>= {
   light: {
     text: Palette.gray900,
@@ -61,6 +67,10 @@ const Colors: Record<ThemeName, ThemeColors>= {
     tabIconSelected: tintColor,
     tabBarBackground: Palette.white,
     tabBarBorder: Palette.gray200,
+    mutedText: Palette.gray600,
+    border: Palette.gray200,
+    divider: Palette.gray200,
+    surface: Palette.lightCardBg,
   },
   dark: {
     text: Palette.gray50,
@@ -70,6 +80,10 @@ const Colors: Record<ThemeName, ThemeColors>= {
     tabIconSelected: tintColor,
     tabBarBackground: Palette.darkTabBg,
     tabBarBorder: Palette.darkTabBorder,
+    mutedText: Palette.gray400,
+    border: Palette.gray700,
+    divider: Palette.gray700,
+    surface: Palette.darkCardBg,
   },
 };
 

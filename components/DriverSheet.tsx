@@ -33,7 +33,7 @@ export default function DriverSheet({ visible, onClose, driver, onOpenPackages }
     }
   }, [visible, translateY]);
 
-const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.lightCardBg), [scheme]);
+const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
   const text = Colors[scheme].text;
   const tint = Colors[scheme].tint;
 
@@ -57,7 +57,7 @@ const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.l
         <SafeAreaView edges={['bottom']} style={{ backgroundColor: Colors[scheme].tabBarBackground, paddingHorizontal: 16, paddingTop: 8, borderTopLeftRadius: 24, borderTopRightRadius: 24 }}>
           {/* Grabber */}
           <View style={{ alignItems: 'center', paddingBottom: 8 }}>
-<View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: scheme === 'dark' ? Palette.gray700 : Palette.gray300 }} />
+            <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: Colors[scheme].divider }} />
           </View>
 
           {/* Driver header */}
@@ -67,12 +67,12 @@ const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.l
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ color: text, fontSize: 18, fontWeight: '700' }}>{driver.name}</Text>
-<Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600 }}>{driver.role}</Text>
+              <Text style={{ color: Colors[scheme].mutedText }}>{driver.role}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
                 {Array.from({ length: 5 }).map((_, i) => (
 <FontAwesome key={i} name="star" size={12} color={i < Math.floor(driver.rating) ? Palette.amber500 : Palette.gray600} style={{ marginRight: 2 }} />
                 ))}
-                <Text style={{ marginLeft: 6, color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, fontSize: 12 }}>{driver.rating.toFixed(1)}</Text>
+                <Text style={{ marginLeft: 6, color: Colors[scheme].mutedText, fontSize: 12 }}>{driver.rating.toFixed(1)}</Text>
               </View>
             </View>
           </View>
@@ -83,14 +83,14 @@ const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.l
               <View style={{ alignItems: 'center', gap: 8 }}>
                 <FontAwesome name="clock-o" size={20} color={tint} />
                 <Text style={{ color: tint, fontSize: 22, fontWeight: '800' }}>{driver.eta}</Text>
-<Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, fontSize: 12 }}>ETA</Text>
+                <Text style={{ color: Colors[scheme].mutedText, fontSize: 12 }}>ETA</Text>
               </View>
             </View>
             <View style={{ flex: 1, backgroundColor: cardBg, borderRadius: 16, padding: 16 }}>
               <View style={{ alignItems: 'center', gap: 8 }}>
                 <FontAwesome name="paper-plane" size={20} color={tint} />
                 <Text style={{ color: tint, fontSize: 22, fontWeight: '800' }}>{driver.progress}%</Text>
-<Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, fontSize: 12 }}>Complete</Text>
+                <Text style={{ color: Colors[scheme].mutedText, fontSize: 12 }}>Complete</Text>
               </View>
             </View>
           </View>

@@ -19,8 +19,8 @@ export function HistoryModal({
   const text = Colors[scheme].text;
   const tint = Colors[scheme].tint;
 
-  const success = 'hsl(142, 71%, 45%)';
-  const destructive = 'hsl(0, 84%, 60%)';
+  const success = Palette.success;
+  const destructive = Palette.destructive;
 
   const hours = 72;
   const data = useMemo(() => {
@@ -90,8 +90,8 @@ export function HistoryModal({
           </View>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-          <Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, fontSize: 11 }}>0h</Text>
-          <Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, fontSize: 11 }}>{series.length - 1}h</Text>
+          <Text style={{ color: Colors[scheme].mutedText, fontSize: 11 }}>0h</Text>
+          <Text style={{ color: Colors[scheme].mutedText, fontSize: 11 }}>{series.length - 1}h</Text>
         </View>
       </View>
     );
@@ -116,12 +116,12 @@ export function HistoryModal({
             paddingHorizontal: 16,
             paddingVertical: 12,
             borderBottomWidth: 1,
-            borderBottomColor: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
+            borderBottomColor: Colors[scheme].border,
           }}
         >
           <View>
             <Text style={{ color: text, fontSize: 20, fontWeight: '800' }}>Package History</Text>
-            <Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, fontFamily: 'monospace', marginTop: 2 }}>
+            <Text style={{ color: Colors[scheme].mutedText, fontFamily: 'monospace', marginTop: 2 }}>
               {selectedId ?? ''}
             </Text>
           </View>
@@ -138,7 +138,7 @@ export function HistoryModal({
               paddingHorizontal: 16,
               paddingVertical: 12,
               borderBottomWidth: 1,
-              borderBottomColor: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
+              borderBottomColor: Colors[scheme].border,
               gap: 16,
             }}
           >
@@ -156,7 +156,7 @@ export function HistoryModal({
                 <FontAwesome name="thermometer-half" color={tint} size={18} />
               </View>
               <View>
-                <Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, fontSize: 12 }}>Avg Temp</Text>
+                <Text style={{ color: Colors[scheme].mutedText, fontSize: 12 }}>Avg Temp</Text>
                 <Text style={{ color: text, fontSize: 16, fontWeight: '800' }}>{avgTemp}{'\u00B0'}C</Text>
               </View>
             </View>
@@ -175,7 +175,7 @@ export function HistoryModal({
                 <FontAwesome name="tint" color={tint} size={18} />
               </View>
               <View>
-                <Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, fontSize: 12 }}>Avg Humidity</Text>
+                <Text style={{ color: Colors[scheme].mutedText, fontSize: 12 }}>Avg Humidity</Text>
                 <Text style={{ color: text, fontSize: 16, fontWeight: '800' }}>{avgHum}%</Text>
               </View>
             </View>
@@ -194,7 +194,7 @@ export function HistoryModal({
                 <FontAwesome name="calendar" color={destructive} size={18} />
               </View>
               <View>
-                <Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, fontSize: 12 }}>Alert Hours</Text>
+                <Text style={{ color: Colors[scheme].mutedText, fontSize: 12 }}>Alert Hours</Text>
                 <Text style={{ color: text, fontSize: 16, fontWeight: '800' }}>{alertCount}/{hours}</Text>
               </View>
             </View>
@@ -216,8 +216,8 @@ export function HistoryModal({
               })}
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
-              <Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, fontSize: 12 }}>3 days ago</Text>
-              <Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, fontSize: 12 }}>Now</Text>
+              <Text style={{ color: Colors[scheme].mutedText, fontSize: 12 }}>3 days ago</Text>
+              <Text style={{ color: Colors[scheme].mutedText, fontSize: 12 }}>Now</Text>
             </View>
           </View>
         </ScrollView>

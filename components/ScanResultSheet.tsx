@@ -43,8 +43,8 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
 
   const text = Colors[scheme].text;
   const tint = Colors[scheme].tint;
-  const cardBg = useMemo(() => (scheme === 'dark' ? Palette.darkCardBg : Palette.lightCardBg), [scheme]);
-  const muted = scheme === 'dark' ? Palette.gray400 : Palette.gray600;
+  const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
+  const muted = Colors[scheme].mutedText;
 
   const vitals = useMemo(() => {
     const items: { label: string; value: string; icon: React.ComponentProps<typeof FontAwesome>['name'] }[] = [];
@@ -94,7 +94,7 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
           }}
         >
           <View style={{ alignItems: 'center' }}>
-            <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: scheme === 'dark' ? Palette.gray700 : Palette.gray300 }} />
+            <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: Colors[scheme].divider }} />
           </View>
 
           <View style={{ gap: 12 }}>
@@ -131,7 +131,7 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
                   padding: 16,
                   gap: 6,
                   borderWidth: 1,
-                  borderColor: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
+                  borderColor: Colors[scheme].border,
                 }}
               >
                 <Text style={{ color: muted, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>
@@ -148,7 +148,7 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
                   borderRadius: 16,
                   padding: 16,
                   borderWidth: 1,
-                  borderColor: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
+                  borderColor: Colors[scheme].border,
                   gap: 12,
                 }}
               >
@@ -164,7 +164,7 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
                         paddingVertical: 12,
                         paddingHorizontal: 14,
                         borderWidth: 1,
-                        borderColor: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
+                        borderColor: Colors[scheme].border,
                         alignItems: 'center',
                         gap: 6,
                       }}
@@ -199,7 +199,7 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
                   padding: 16,
                   gap: 6,
                   borderWidth: 1,
-                  borderColor: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
+                  borderColor: Colors[scheme].border,
                 }}
               >
                 <Text style={{ color: muted, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>

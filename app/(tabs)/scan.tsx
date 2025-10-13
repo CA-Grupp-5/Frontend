@@ -145,7 +145,7 @@ export default function ScanScreen() {
         </Text>
         <Text
           style={{
-            color: scheme === 'dark' ? Palette.gray400 : Palette.gray600,
+            color: Colors[scheme].mutedText,
             textAlign: 'center',
             marginBottom: 18,
           }}

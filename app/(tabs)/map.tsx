@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import DriverSheet from '@/components/DriverSheet';
 import { PackagesModal } from '@/components/PackagesModal';
-import Colors from '@/constants/Colors';
+import Colors, { Palette } from '@/constants/Colors';
 import Constants from 'expo-constants';
 import { geocodeAddress, type LngLat } from '@/lib/mapbox';
 import { computeBoundsFromRoute, expandBoundsAround } from '@/lib/map-geometry';
@@ -203,7 +203,7 @@ export default function MapScreen() {
                 justifyContent: 'center',
               }}
             >
-              <FontAwesome name="truck" size={24} color={'hsl(0, 0%, 100%)'} />
+              <FontAwesome name="truck" size={24} color={Palette.white} />
             </View>
           </Pressable>
         </Mapbox.MarkerView>
@@ -221,7 +221,7 @@ export default function MapScreen() {
                   justifyContent: 'center',
                 }}
               >
-                <FontAwesome name="home" size={22} color={'hsl(0, 0%, 100%)'} />
+                <FontAwesome name="home" size={22} color={Palette.white} />
               </View>
             </View>
           </Mapbox.MarkerView>

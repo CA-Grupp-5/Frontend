@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
-import Colors from '@/constants/Colors';
+import Colors, { Palette } from '@/constants/Colors';
 
 // Render a white icon on top of a tinted circular background when focused
 function CircleTabIcon({ name, focused, tint, inactive }: { name: React.ComponentProps<typeof FontAwesome>['name']; focused: boolean; tint: string; inactive: string }) {
@@ -20,7 +20,7 @@ function CircleTabIcon({ name, focused, tint, inactive }: { name: React.Componen
             justifyContent: 'center',
           }}
         >
-          <FontAwesome name={name} size={20} color={'hsl(0, 0%, 100%)'} />
+          <FontAwesome name={name} size={20} color={Palette.white} />
         </View>
         
       </View>

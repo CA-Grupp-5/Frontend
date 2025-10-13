@@ -23,6 +23,7 @@ type ItemColors = {
   divider: string;
   success: string;
   destructive: string;
+  muted: string;
 };
 
 type HistoryButtonProps = { id: string; tint: string; onPress: (id: string) => void; variant?: 'outline' | 'ghost' };
@@ -72,7 +73,7 @@ const GridItem = React.memo(function GridItem({ item, colors, onHistory }: Packa
       }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-        <Text style={{ color: colors.text === Palette.gray50 ? Palette.gray400 : Palette.gray600, fontSize: 12, fontFamily: 'monospace' }}>{item.id}</Text>
+        <Text style={{ color: colors.muted, fontSize: 12, fontFamily: 'monospace' }}>{item.id}</Text>
         <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: item.status === 'good' ? colors.success : colors.destructive }} />
       </View>
 
@@ -111,7 +112,7 @@ const CardItem = React.memo(function CardItem({ item, colors, onHistory }: Packa
           </View>
           <View>
             <Text style={{ color: colors.text, fontSize: 16, fontWeight: '800', fontFamily: 'monospace' }}>{item.id}</Text>
-            <Text style={{ color: colors.text === Palette.gray50 ? Palette.gray400 : Palette.gray600, fontSize: 12 }}>
+            <Text style={{ color: colors.muted, fontSize: 12 }}>
               {item.status === 'good' ? 'Optimal Conditions' : 'Attention Required'}
             </Text>
           </View>
@@ -123,14 +124,14 @@ const CardItem = React.memo(function CardItem({ item, colors, onHistory }: Packa
         <View style={{ flex: 1, backgroundColor: colors.border, borderRadius: 12, padding: 12 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <FontAwesome name="thermometer-half" size={18} color={colors.tint} />
-            <Text style={{ color: colors.text === Palette.gray50 ? Palette.gray400 : Palette.gray600, fontSize: 12 }}>Temperature</Text>
+            <Text style={{ color: colors.muted, fontSize: 12 }}>Temperature</Text>
           </View>
           <Text style={{ color: colors.text, fontSize: 22, fontWeight: '800' }}>{item.temperature}{'\u00B0'}C</Text>
         </View>
         <View style={{ flex: 1, backgroundColor: colors.border, borderRadius: 12, padding: 12 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <FontAwesome name="tint" size={18} color={colors.tint} />
-            <Text style={{ color: colors.text === Palette.gray50 ? Palette.gray400 : Palette.gray600, fontSize: 12 }}>Humidity</Text>
+            <Text style={{ color: colors.muted, fontSize: 12 }}>Humidity</Text>
           </View>
           <Text style={{ color: colors.text, fontSize: 22, fontWeight: '800' }}>{item.humidity}%</Text>
         </View>
@@ -158,7 +159,7 @@ const ListItem = React.memo(function ListItem({ item, colors, onHistory }: Packa
 
       <View style={{ width: 100 }}>
         <Text style={{ color: colors.text, fontWeight: '800', fontFamily: 'monospace' }}>{item.id}</Text>
-        <Text style={{ color: colors.text === Palette.gray50 ? Palette.gray400 : Palette.gray600, fontSize: 12 }}>
+        <Text style={{ color: colors.muted, fontSize: 12 }}>
           {item.status === 'good' ? 'Normal' : 'Alert'}
         </Text>
       </View>
@@ -168,14 +169,14 @@ const ListItem = React.memo(function ListItem({ item, colors, onHistory }: Packa
           <FontAwesome name="thermometer-half" size={16} color={colors.tint} />
           <View>
             <Text style={{ color: colors.text, fontWeight: '700' }}>{item.temperature}{'\u00B0'}C</Text>
-            <Text style={{ color: colors.text === Palette.gray50 ? Palette.gray400 : Palette.gray600, fontSize: 11 }}>Temp</Text>
+            <Text style={{ color: colors.muted, fontSize: 11 }}>Temp</Text>
           </View>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <FontAwesome name="tint" size={16} color={colors.tint} />
           <View>
             <Text style={{ color: colors.text, fontWeight: '700' }}>{item.humidity}%</Text>
-            <Text style={{ color: colors.text === Palette.gray50 ? Palette.gray400 : Palette.gray600, fontSize: 11 }}>Humidity</Text>
+            <Text style={{ color: colors.muted, fontSize: 11 }}>Humidity</Text>
           </View>
         </View>
       </View>
@@ -203,18 +204,19 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   const [historyOpen, setHistoryOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const success = 'hsl(142, 71%, 45%)';
-  const destructive = 'hsl(0, 84%, 60%)';
+  const success = Palette.success;
+  const destructive = Palette.destructive;
 
   const colors = useMemo<ItemColors>(
     () => ({
       text,
       tint,
-      cardBg: scheme === 'dark' ? Palette.darkCardBg : Palette.lightCardBg,
-      border: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
-      divider: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
+      cardBg: Colors[scheme].surface,
+      border: Colors[scheme].border,
+      divider: Colors[scheme].divider,
       success,
       destructive,
+      muted: Colors[scheme].mutedText,
     }),
     [scheme, text, tint, success, destructive]
   );
@@ -251,12 +253,12 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 borderBottomWidth: 1,
-                borderBottomColor: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
+                borderBottomColor: Colors[scheme].border,
               }}
             >
               <View>
                 <Text style={{ color: text, fontSize: 22, fontWeight: '800' }}>Packages</Text>
-                <Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600 }}>{SAMPLE_PACKAGES.length} packages in transit</Text>
+                <Text style={{ color: Colors[scheme].mutedText }}>{SAMPLE_PACKAGES.length} packages in transit</Text>
               </View>
               <Pressable
                 onPress={onClose}
@@ -278,10 +280,10 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                 paddingHorizontal: 16,
                 paddingVertical: 10,
                 borderBottomWidth: 1,
-                borderBottomColor: scheme === 'dark' ? Palette.gray700 : Palette.gray200,
+                borderBottomColor: Colors[scheme].divider,
               }}
             >
-              <Text style={{ color: scheme === 'dark' ? Palette.gray400 : Palette.gray600, marginRight: 6 }}>View:</Text>
+              <Text style={{ color: Colors[scheme].mutedText, marginRight: 6 }}>View:</Text>
               {(
                 [
                   ['grid', 'th'],
@@ -305,7 +307,7 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                       paddingVertical: 6,
                       borderRadius: 999,
                       borderWidth: active ? 0 : 1,
-                      borderColor: scheme === 'dark' ? Palette.gray700 : Palette.gray300,
+                       borderColor: Colors[scheme].border,
                       backgroundColor: active ? tint : 'transparent',
                     }}
                   >

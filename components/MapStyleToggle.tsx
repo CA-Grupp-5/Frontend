@@ -33,7 +33,7 @@ export default function MapStyleToggle({ label, tint, onPress }: Props) {
           borderWidth: 1,
           borderColor: Colors[theme].tabBarBorder,
           gap: 8,
-          shadowColor: '#000',
+          shadowColor: Palette.black,
           shadowOpacity: 0.15,
           shadowRadius: 6,
           shadowOffset: { width: 0, height: 2 },
