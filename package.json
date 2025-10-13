@@ -14,11 +14,12 @@
     "ios": "bun expo run:ios",
     "ios:prebuild": "npx expo prebuild && bun expo run:ios",
     "web": "bun run expo start --web",
-    "test": "bun run jest --watchAll",
+    "t": "bunx jest",
     "format": "bun run prettier --write .",
     "format:check": "bun run prettier --check .",
     "clean": "rm -rf node_modules; rm -rf ios/build; rm -rf ios/build; rm -rf ios/Pods; rm -rf ios/Podfile.lock; rm -rf ~/Library/Developer/Xcode/DerivedData/",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "type": "tsc --noEmit"
   },
   "jest": {
     "preset": "jest-expo",
@@ -84,6 +85,5 @@
   "overrides": {
     "write-file-atomic": "^5.0.1"
   },
-  "private": true,
-  "packageManager": "yarn@4.9.1+sha512.f95ce356460e05be48d66401c1ae64ef84d163dd689964962c6888a9810865e39097a5e9de748876c2e0bf89b232d583c33982773e9903ae7a76257270986538"
+  "private": true
 }

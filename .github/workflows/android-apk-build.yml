@@ -35,8 +35,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -49,6 +47,19 @@ jobs:
 
       - name: Install dependencies
         run: bun install
+
+      # Non-blocking quality checks
+      - name: Lint (ESLint)
+        run: bun lint
+        continue-on-error: true
+
+      - name: Typecheck (tsc)
+        run: bun type
+        continue-on-error: true
+
+      - name: Tests (Jest)
+        run: bunx jest --ci --runInBand
+        continue-on-error: true
 
       - name: Setup Java
         uses: actions/setup-java@v4
