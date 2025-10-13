@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useAuthStore } from '@/stores/authStore';
-import { Palette } from '@/constants/Colors';
+import Colors from '@/constants/Colors';
 
 const { width, height } = Dimensions.get('window');
 
@@ -148,18 +148,17 @@ export default function LoginScreen() {
     loginGuest();
   };
 
-  const isDark = colorScheme === 'dark';
+  const scheme = (colorScheme ?? 'light') as 'light' | 'dark';
   
-  // const bgColor = isDark ? Palette.gray900 : Palette.gray50;
-  const cardBgColor = isDark ? Palette.darkCardBg : Palette.lightCardBg;
-  const inputBgColor = isDark ? Palette.gray600 : Palette.gray200;
-  const textColor = isDark ? Palette.white : Palette.gray900;
-  const subtextColor = isDark ? Palette.gray400 : Palette.gray500;
-  const borderColor = Palette.tint;
-  const buttonColor = Palette.tint;
+  const cardBgColor = Colors[scheme].surface;
+  const inputBgColor = Colors[scheme].inputBackground;
+  const textColor = Colors[scheme].text;
+  const subtextColor = Colors[scheme].mutedText;
+  const borderColor = Colors[scheme].tint;
+  const buttonColor = Colors[scheme].tint;
 
   return (
-    <View className={`flex-1 ${isDark ? 'bg-palette-gray-900' : 'bg-palette-gray-50'}`}>
+    <View className="flex-1 bg-palette-gray-50 dark:bg-palette-gray-900">
       <StatusBar style="light" />
       
       {/* Background with orbital rings */}

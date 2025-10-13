@@ -56,6 +56,7 @@ interface ThemeColors  {
   border: string;    // card borders
   divider: string;   // list row separators
   surface: string;   // card surfaces
+  inputBackground: string; // inputs and similar fields
 }
 // Mapping of theme names to colors to avoid calculating colors in the individual components
 const Colors: Record<ThemeName, ThemeColors>= {
@@ -71,6 +72,7 @@ const Colors: Record<ThemeName, ThemeColors>= {
     border: Palette.gray200,
     divider: Palette.gray200,
     surface: Palette.lightCardBg,
+    inputBackground: Palette.gray200,
   },
   dark: {
     text: Palette.gray50,
@@ -84,6 +86,7 @@ const Colors: Record<ThemeName, ThemeColors>= {
     border: Palette.gray700,
     divider: Palette.gray700,
     surface: Palette.darkCardBg,
+    inputBackground: Palette.gray600,
   },
 };
 
