@@ -23,7 +23,7 @@ export default function MapScreen() {
   const [sheetVisible, setSheetVisible] = useState(false);
   const [packagesVisible, setPackagesVisible] = useState(false);
 
-  
+  // kept simple for now, might expand to a modal if I end up adding more style options
   const STYLE_OPTIONS = useMemo(
     () => [
       { key: 'dark', label: 'Dark', url: Mapbox.StyleURL.Dark },
@@ -44,6 +44,7 @@ export default function MapScreen() {
   const [routeGeom, setRouteGeom] = useState<any | null>(null);
   const [eta, setEta] = useState<string>('');
 
+  
   const driver = useMemo(
     () => ({
       name: 'Marcus Johnson',
