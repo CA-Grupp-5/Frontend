@@ -21,7 +21,8 @@ const mmkvStorage = {
 interface AuthState {
   isAuthenticated: boolean;
   rememberMe: boolean;
-  login: (email: string, password: string, rememberMe?: boolean) => Promise<boolean>;
+  login: (email?: string, password?: string, rememberMe?: boolean) => Promise<boolean>;
+  loginGuest: () => void;
   logout: () => void;
 }
 
@@ -30,13 +31,23 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       isAuthenticated: false,
       rememberMe: false,
-      // Temporary for testing/dev phase
-      login: async (email: string, password: string, rememberMe = false): Promise<boolean> => {
-        set({ 
-          isAuthenticated: true, 
-            rememberMe 
-        });
-        return true;
+      // Call API: requires password; email optional based on UI default
+      login: async (email?: string, password?: string, rememberMe = false): Promise<boolean> => {
+        if (!password || !password.trim()) return false;
+        try {
+          const { login: apiLogin } = await import('@/lib/api');
+          await apiLogin(email ?? '', password);
+          set({ isAuthenticated: true, rememberMe });
+          return true;
+        } catch (e) {
+          console.log(e);
+          return false;
+        }
+      },
+
+      // Guest login always authenticates
+      loginGuest: () => {
+        set({ isAuthenticated: true, rememberMe: false });
       },
       
       logout: () => {

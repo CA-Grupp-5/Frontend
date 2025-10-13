@@ -48,6 +48,7 @@ export default {
     extra: {
       // Consumed in app/_layout.tsx via Constants.expoConfig?.extra
       MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN ?? '',
+      POSTGRES_URL: process.env.POSTGRES_URL ?? '',
     },
   },
 };

@@ -115,26 +115,26 @@ const styles = StyleSheet.create({
 
 export default function LoginScreen() {
   const { colorScheme } = useColorScheme();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('anders@gmail.com');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   
   const login = useAuthStore((state) => state.login);
+  const loginGuest = useAuthStore((state) => state.loginGuest);
 
   const handleLogin = async () => {
-    // Removed for dev
-    // if (!email.trim() || !password.trim()) {
-    //   Alert.alert('Error', 'Please enter both email and password');
-    //   return;
-    // }
+    if (!password.trim()) {
+      Alert.alert('Error', 'Please enter your password');
+      return;
+    }
 
     setIsLoading(true);
     try {
       const success = await login(email, password, rememberMe);
       if (!success) {
-        Alert.alert('Error', 'Invalid email or password');
+        Alert.alert('Error', 'Invalid password');
       }
     } catch (error) {
       console.log(error)
@@ -142,6 +142,10 @@ export default function LoginScreen() {
     } finally {
       setIsLoading(false);
     }
+  };
+// Convenience function for guest login
+  const handleGuestLogin = () => {
+    loginGuest();
   };
 
   const isDark = colorScheme === 'dark';
@@ -318,6 +322,26 @@ export default function LoginScreen() {
             >
               <Text className="text-white text-base font-semibold">
                 {isLoading ? 'Signing In...' : 'Sign In'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Guest Login Button */}
+            <TouchableOpacity
+              className="py-4 items-center mt-3"
+              style={[
+                styles.signInButton,
+                {
+                  backgroundColor: 'transparent',
+                  shadowColor: 'transparent',
+                  borderWidth: 1,
+                  borderColor: borderColor,
+                }
+              ]}
+              onPress={handleGuestLogin}
+              disabled={isLoading}
+            >
+              <Text className="text-base font-semibold" style={{ color: borderColor }}>
+                Continue as Guest
               </Text>
             </TouchableOpacity>
           </View>

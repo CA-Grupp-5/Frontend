@@ -36,3 +36,7 @@
 SCRIPT NOTES:
 RUN this to avoid conflicts with bun's own tester
 bunx jest
+
+
+DATA FORMAT NOTES:
+
