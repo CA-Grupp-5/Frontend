@@ -82,14 +82,14 @@ const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
             <View style={{ flex: 1, backgroundColor: cardBg, borderRadius: 16, padding: 16 }}>
               <View style={{ alignItems: 'center', gap: 8 }}>
                 <FontAwesome name="clock-o" size={20} color={tint} />
-                <Text style={{ color: tint, fontSize: 22, fontWeight: '800' }}>{driver.eta}</Text>
+                <Text style={{ color: Colors[scheme].text, fontSize: 22, fontWeight: '800' }}>{driver.eta}</Text>
                 <Text style={{ color: Colors[scheme].mutedText, fontSize: 12 }}>ETA</Text>
               </View>
             </View>
             <View style={{ flex: 1, backgroundColor: cardBg, borderRadius: 16, padding: 16 }}>
               <View style={{ alignItems: 'center', gap: 8 }}>
                 <FontAwesome name="paper-plane" size={20} color={tint} />
-                <Text style={{ color: tint, fontSize: 22, fontWeight: '800' }}>{driver.progress}%</Text>
+                <Text style={{ color: Colors[scheme].text, fontSize: 22, fontWeight: '800' }}>{driver.progress}%</Text>
                 <Text style={{ color: Colors[scheme].mutedText, fontSize: 12 }}>Complete</Text>
               </View>
             </View>
@@ -115,7 +115,7 @@ const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
             }}
           >
             <FontAwesome name="phone" size={16} color={tint} />
-            <Text style={{ color: tint, fontWeight: '600' }}>Call</Text>
+            <Text style={{ color: Colors[scheme].text, fontWeight: '600' }}>Call</Text>
           </Pressable>
           {/* Packages link */}
           <Pressable

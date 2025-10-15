@@ -301,7 +301,7 @@ export default function LoginScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity>
-                <Text className="text-sm font-medium" style={{ color: borderColor }}>Forgot password?</Text>
+                <Text className="text-sm font-medium" style={{ color: subtextColor }}>Forgot password?</Text>
               </TouchableOpacity>
             </View>
 
@@ -319,7 +319,7 @@ export default function LoginScreen() {
               onPress={handleLogin}
               disabled={isLoading}
             >
-              <Text className="text-white text-base font-semibold">
+              <Text className="text-black dark:text-gray-50 text-base font-semibold">
                 {isLoading ? 'Signing In...' : 'Sign In'}
               </Text>
             </TouchableOpacity>
@@ -339,7 +339,7 @@ export default function LoginScreen() {
               onPress={handleGuestLogin}
               disabled={isLoading}
             >
-              <Text className="text-base font-semibold" style={{ color: borderColor }}>
+              <Text className="text-base font-semibold" style={{ color: textColor }}>
                 Continue as Guest
               </Text>
             </TouchableOpacity>

@@ -28,6 +28,8 @@ type ItemColors = {
 
 type HistoryButtonProps = { id: string; tint: string; onPress: (id: string) => void; variant?: 'outline' | 'ghost' };
 const HistoryButton = React.memo(function HistoryButton({ id, tint, onPress, variant = 'outline' }: HistoryButtonProps) {
+  const { colorScheme } = useColorScheme();
+  const scheme = colorScheme ?? 'light';
   return (
     <Pressable
       onPress={() => onPress(id)}
@@ -50,7 +52,7 @@ const HistoryButton = React.memo(function HistoryButton({ id, tint, onPress, var
       }
     >
       <FontAwesome name="history" size={14} color={tint} />
-      <Text style={{ color: tint, fontWeight: '600', marginLeft: 6 }}>
+      <Text style={{ color: Colors[scheme].text, fontWeight: '600', marginLeft: 6 }}>
         {variant === 'outline' ? 'View History' : 'History'}
       </Text>
     </Pressable>
@@ -312,7 +314,7 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                     }}
                   >
                     <FontAwesome name={icon as any} size={14} color={active ? Palette.white : text} />
-                    <Text style={{ color: active ? Palette.white : text, fontWeight: '600', textTransform: 'capitalize' }}>{m}</Text>
+                    <Text style={{ color: Colors[scheme].text, fontWeight: '600', textTransform: 'capitalize' }}>{m}</Text>
                   </Pressable>
                 );
               })}
