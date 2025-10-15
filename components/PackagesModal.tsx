@@ -1,192 +1,21 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, Text, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { FlatList, Modal, Pressable, Text, View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
-import Colors, { Palette } from '@/constants/Colors';
+import Colors, { ThemeName } from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import HistoryModal from './HistoryModal';
-
 type ViewMode = 'grid' | 'card' | 'list';
-
 type PackageItem = {
   id: string;
   status: 'good' | 'alert';
   temperature: string;
   humidity: string;
 };
-
-type ItemColors = {
-  text: string;
-  tint: string;
-  cardBg: string;
-  border: string;
-  divider: string;
-  success: string;
-  destructive: string;
-  muted: string;
-};
-
-type HistoryButtonProps = { id: string; tint: string; onPress: (id: string) => void; variant?: 'outline' | 'ghost' };
-const HistoryButton = React.memo(function HistoryButton({ id, tint, onPress, variant = 'outline' }: HistoryButtonProps) {
-  const { colorScheme } = useColorScheme();
-  const scheme = colorScheme ?? 'light';
-  return (
-    <Pressable
-      onPress={() => onPress(id)}
-      accessibilityRole="button"
-      accessibilityLabel={`View history for ${id}`}
-      hitSlop={10}
-      style={
-        variant === 'outline'
-          ? {
-              borderWidth: 1,
-              borderColor: tint,
-              paddingVertical: 8,
-              paddingHorizontal: 12,
-              borderRadius: 10,
-              alignItems: 'center',
-              flexDirection: 'row',
-              justifyContent: 'center',
-            }
-          : { paddingVertical: 6, paddingHorizontal: 8, borderRadius: 10, flexDirection: 'row', alignItems: 'center', marginLeft: 16 }
-      }
-    >
-      <FontAwesome name="history" size={14} color={tint} />
-      <Text style={{ color: Colors[scheme].text, fontWeight: '600', marginLeft: 6 }}>
-        {variant === 'outline' ? 'View History' : 'History'}
-      </Text>
-    </Pressable>
-  );
-});
-
-type PackageRowProps = { item: PackageItem; colors: ItemColors; onHistory: (id: string) => void };
-
-const GridItem = React.memo(function GridItem({ item, colors, onHistory }: PackageRowProps) {
-  return (
-    <View
-      style={{
-        backgroundColor: colors.cardBg,
-        borderRadius: 16,
-        padding: 12,
-        gap: 10,
-        flex: 1,
-        borderWidth: 1,
-        borderColor: colors.border,
-      }}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
-        <Text style={{ color: colors.muted, fontSize: 12, fontFamily: 'monospace' }}>{item.id}</Text>
-        <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: item.status === 'good' ? colors.success : colors.destructive }} />
-      </View>
-
-      <View style={{ gap: 8, marginBottom: 4 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <FontAwesome name="thermometer-half" size={16} color={colors.tint} />
-          <Text style={{ color: colors.text, fontWeight: '600' }}>{item.temperature}{'\u00B0'}C</Text>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <FontAwesome name="tint" size={16} color={colors.tint} />
-          <Text style={{ color: colors.text, fontWeight: '600' }}>{item.humidity}%</Text>
-        </View>
-      </View>
-
-      <HistoryButton id={item.id} tint={colors.tint} onPress={onHistory} variant="outline" />
-    </View>
-  );
-});
-
-const CardItem = React.memo(function CardItem({ item, colors, onHistory }: PackageRowProps) {
-  return (
-    <View
-      style={{
-        backgroundColor: colors.cardBg,
-        borderRadius: 20,
-        padding: 16,
-        gap: 12,
-        borderWidth: 2,
-        borderColor: colors.border,
-      }}
-    >
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <View style={{ width: 48, height: 48, borderRadius: 12, backgroundColor: colors.border, alignItems: 'center', justifyContent: 'center' }}>
-            <FontAwesome name="cube" size={24} color={colors.tint} />
-          </View>
-          <View>
-            <Text style={{ color: colors.text, fontSize: 16, fontWeight: '800', fontFamily: 'monospace' }}>{item.id}</Text>
-            <Text style={{ color: colors.muted, fontSize: 12 }}>
-              {item.status === 'good' ? 'Optimal Conditions' : 'Attention Required'}
-            </Text>
-          </View>
-        </View>
-        <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: item.status === 'good' ? colors.success : colors.destructive }} />
-      </View>
-
-      <View style={{ flexDirection: 'row', gap: 12 }}>
-        <View style={{ flex: 1, backgroundColor: colors.border, borderRadius: 12, padding: 12 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <FontAwesome name="thermometer-half" size={18} color={colors.tint} />
-            <Text style={{ color: colors.muted, fontSize: 12 }}>Temperature</Text>
-          </View>
-          <Text style={{ color: colors.text, fontSize: 22, fontWeight: '800' }}>{item.temperature}{'\u00B0'}C</Text>
-        </View>
-        <View style={{ flex: 1, backgroundColor: colors.border, borderRadius: 12, padding: 12 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <FontAwesome name="tint" size={18} color={colors.tint} />
-            <Text style={{ color: colors.muted, fontSize: 12 }}>Humidity</Text>
-          </View>
-          <Text style={{ color: colors.text, fontSize: 22, fontWeight: '800' }}>{item.humidity}%</Text>
-        </View>
-      </View>
-
-      <HistoryButton id={item.id} tint={colors.tint} onPress={onHistory} variant="outline" />
-    </View>
-  );
-});
-
-const ListItem = React.memo(function ListItem({ item, colors, onHistory }: PackageRowProps) {
-  return (
-    <View
-      style={{
-        paddingVertical: 12,
-        paddingHorizontal: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.divider,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-      }}
-    >
-      <View style={{ width: 4, height: 48, borderRadius: 2, backgroundColor: item.status === 'good' ? colors.success : colors.destructive }} />
-
-      <View style={{ width: 100 }}>
-        <Text style={{ color: colors.text, fontWeight: '800', fontFamily: 'monospace' }}>{item.id}</Text>
-        <Text style={{ color: colors.muted, fontSize: 12 }}>
-          {item.status === 'good' ? 'Normal' : 'Alert'}
-        </Text>
-      </View>
-
-      <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 16 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <FontAwesome name="thermometer-half" size={16} color={colors.tint} />
-          <View>
-            <Text style={{ color: colors.text, fontWeight: '700' }}>{item.temperature}{'\u00B0'}C</Text>
-            <Text style={{ color: colors.muted, fontSize: 11 }}>Temp</Text>
-          </View>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <FontAwesome name="tint" size={16} color={colors.tint} />
-          <View>
-            <Text style={{ color: colors.text, fontWeight: '700' }}>{item.humidity}%</Text>
-            <Text style={{ color: colors.muted, fontSize: 11 }}>Humidity</Text>
-          </View>
-        </View>
-      </View>
-
-      <HistoryButton id={item.id} tint={colors.tint} onPress={onHistory} variant="ghost" />
-    </View>
-  );
-});
+import GridItem from './packages/items/GridItem';
+import CardItem from './packages/items/CardItem';
+import ListItem from './packages/items/ListItem';
+import ViewModeSelector from './packages/ViewModeSelector';
 
 const SAMPLE_PACKAGES: PackageItem[] = Array.from({ length: 50 }, (_, i) => {
   const id = `PKG-${String(i + 1).padStart(4, '0')}`;
@@ -196,32 +25,14 @@ const SAMPLE_PACKAGES: PackageItem[] = Array.from({ length: 50 }, (_, i) => {
   return { id, status, temperature, humidity };
 });
 
-export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { colorScheme } = useColorScheme();
-  const scheme = colorScheme ?? 'light';
+  const scheme = (colorScheme ?? 'light') as ThemeName;
   const text = Colors[scheme].text;
-  const tint = Colors[scheme].tint;
 
   const [mode, setMode] = useState<ViewMode>('grid');
   const [historyOpen, setHistoryOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-
-  const success = Palette.success;
-  const destructive = Palette.destructive;
-
-  const colors = useMemo<ItemColors>(
-    () => ({
-      text,
-      tint,
-      cardBg: Colors[scheme].surface,
-      border: Colors[scheme].border,
-      divider: Colors[scheme].divider,
-      success,
-      destructive,
-      muted: Colors[scheme].mutedText,
-    }),
-    [scheme, text, tint, success, destructive]
-  );
 
   const onHistory = useCallback((id: string) => {
     setSelectedId(id);
@@ -229,16 +40,16 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   }, []);
 
   const renderGridItem = useCallback(
-    ({ item }: { item: PackageItem }) => <GridItem item={item} colors={colors} onHistory={onHistory} />,
-    [colors, onHistory]
+    ({ item }: { item: PackageItem }) => <GridItem item={item} scheme={scheme} onHistory={onHistory} />,
+    [scheme, onHistory]
   );
   const renderCardItem = useCallback(
-    ({ item }: { item: PackageItem }) => <CardItem item={item} colors={colors} onHistory={onHistory} />,
-    [colors, onHistory]
+    ({ item }: { item: PackageItem }) => <CardItem item={item} scheme={scheme} onHistory={onHistory} />,
+    [scheme, onHistory]
   );
   const renderListItem = useCallback(
-    ({ item }: { item: PackageItem }) => <ListItem item={item} colors={colors} onHistory={onHistory} />,
-    [colors, onHistory]
+    ({ item }: { item: PackageItem }) => <ListItem item={item} scheme={scheme} onHistory={onHistory} />,
+    [scheme, onHistory]
   );
 
   return (
@@ -274,51 +85,7 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
             </View>
 
             {/* View Mode Selector */}
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 8,
-                paddingHorizontal: 16,
-                paddingVertical: 10,
-                borderBottomWidth: 1,
-                borderBottomColor: Colors[scheme].divider,
-              }}
-            >
-              <Text style={{ color: Colors[scheme].mutedText, marginRight: 6 }}>View:</Text>
-              {(
-                [
-                  ['grid', 'th'],
-                  ['card', 'clone'],
-                  ['list', 'list'],
-                ] as [ViewMode, React.ComponentProps<typeof FontAwesome>['name']][]
-              ).map(([m, icon]) => {
-                const active = mode === m;
-                return (
-                  <Pressable
-                    key={m}
-                    onPress={() => setMode(m)}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Set view to ${m}`}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 8,
-                      paddingHorizontal: 12,
-                      paddingVertical: 6,
-                      borderRadius: 999,
-                      borderWidth: active ? 0 : 1,
-                       borderColor: Colors[scheme].border,
-                      backgroundColor: active ? tint : 'transparent',
-                    }}
-                  >
-                    <FontAwesome name={icon as any} size={14} color={active ? Palette.white : text} />
-                    <Text style={{ color: Colors[scheme].text, fontWeight: '600', textTransform: 'capitalize' }}>{m}</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+            <ViewModeSelector mode={mode} onChange={setMode} scheme={scheme} />
 
             {/* Content */}
             {mode === 'grid' && (
@@ -326,8 +93,8 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                 data={SAMPLE_PACKAGES}
                 key={'grid'}
                 numColumns={2}
-                contentContainerStyle={{ padding: 12, gap: 12 }}
-                columnWrapperStyle={{ gap: 12 }}
+                contentContainerStyle={styles.gridContent}
+                columnWrapperStyle={styles.gridColumn}
                 initialNumToRender={12}
                 windowSize={5}
                 removeClippedSubviews
@@ -340,8 +107,8 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
               <FlatList
                 data={SAMPLE_PACKAGES}
                 key={'card'}
-                contentContainerStyle={{ padding: 12, gap: 12 }}
-                ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+                contentContainerStyle={styles.listContent}
+                ItemSeparatorComponent={() => <View style={styles.cardSeparator} />}
                 initialNumToRender={10}
                 windowSize={5}
                 removeClippedSubviews
@@ -354,7 +121,7 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
               <FlatList
                 data={SAMPLE_PACKAGES}
                 key={'list'}
-                contentContainerStyle={{ paddingHorizontal: 6 }}
+                contentContainerStyle={styles.listNarrow}
                 initialNumToRender={20}
                 windowSize={7}
                 removeClippedSubviews
@@ -372,4 +139,23 @@ export function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
   );
 }
 
-export default PackagesModal;
+const styles = StyleSheet.create({
+  gridContent: {
+    padding: 12,
+    gap: 12,
+  },
+  gridColumn: {
+    gap: 12,
+  },
+  listContent: {
+    padding: 12,
+    gap: 12,
+  },
+  cardSeparator: {
+    height: 12,
+  },
+  listNarrow: {
+    paddingHorizontal: 6,
+  },
+});
+
