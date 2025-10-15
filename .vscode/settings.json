@@ -10,6 +10,7 @@
         "Podfile",
         "qrcode",
         "rescan",
+        "sclear",
         "Sveavagen",
         "temurin",
         "WCAG"

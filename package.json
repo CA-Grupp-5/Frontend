@@ -5,6 +5,7 @@
   "scripts": {
     "start2": "node ./scripts/start-expo.cjs",
     "s": "bun expo start --dev-client --host lan",
+    "sclear": "bun s --clear",
     "start": "bun expo start --dev-client --host lan",
     "sc": "node ./scripts/start-expo.cjs",
     "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-debug.ps1",
@@ -19,11 +20,14 @@
     "format:check": "bun run prettier --check .",
     "clean": "rm -rf node_modules; rm -rf ios/build; rm -rf ios/build; rm -rf ios/Pods; rm -rf ios/Podfile.lock; rm -rf ~/Library/Developer/Xcode/DerivedData/",
     "lint": "eslint .",
-    "type": "tsc --noEmit"
+    "type": "tsc --noEmit",
+    "doc": "bunx expo-doctor"
   },
   "jest": {
     "preset": "jest-expo",
-    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"]
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ]
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -47,6 +51,7 @@
     "qrcode": "^1.5.4",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "react-hook-form": "^7.65.0",
     "react-native": "0.79.5",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-mmkv": "2.12.2",
@@ -85,5 +90,6 @@
   "overrides": {
     "write-file-atomic": "^5.0.1"
   },
-  "private": true
+  "private": true,
+  "packageManager": "yarn@4.9.1+sha512.f95ce356460e05be48d66401c1ae64ef84d163dd689964962c6888a9810865e39097a5e9de748876c2e0bf89b232d583c33982773e9903ae7a76257270986538"
 }
