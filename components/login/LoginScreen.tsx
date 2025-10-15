@@ -1,5 +1,5 @@
 import React from 'react';
-import AuthForm from './login/AuthForm';
+import AuthForm from './AuthForm';
 
 export default function LoginScreen() {
   return <AuthForm />;

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DriverSheet from '@/components/DriverSheet';
 import PackagesModal  from '@/components/PackagesModal';
-import MapView from '@/components/MapView';
+import MapView from '@/components/map/MapView';
 
 export default function MapScreen() {
   const [sheetVisible, setSheetVisible] = useState(false);

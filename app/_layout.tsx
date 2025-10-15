@@ -12,7 +12,7 @@ import { LogBox } from 'react-native';
 
 import '../global.css';
 import { useAuthStore } from '@/stores/authStore';
-import LoginScreen from '@/components/LoginScreen';
+import LoginScreen from '@/components/login/LoginScreen';
 
 export {
   // Catch any errors thrown by the Layout component.

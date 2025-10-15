@@ -7,7 +7,7 @@ import Colors, { Palette } from '@/constants/Colors';
 import Constants from 'expo-constants';
 import { geocodeAddress, type LngLat } from '@/lib/mapbox';
 import { computeBoundsFromRoute, expandBoundsAround } from '@/lib/map-geometry';
-import MapStyleToggle from '@/components/MapStyleToggle';
+import MapStyleToggle from '@/components/map/MapStyleToggle';
 
 const BOUNDS_PADDING = 48;
 const HOME_ADDRESS = 'Sveavagen 168, 113 46 Stockholm, Sweden' as const;
