@@ -4,7 +4,7 @@ import { CameraView, useCameraPermissions, type BarcodeScanningResult, type Came
 import { useColorScheme } from 'nativewind';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Colors, { Palette } from '@/constants/Colors';
 import ScanResultSheet, { type ScanResultPayload } from '@/components/ScanResultSheet';
@@ -60,11 +60,14 @@ export default function ScanScreen() {
   const scheme = colorScheme ?? 'dark';
   const [permission, requestPermission] = useCameraPermissions();
   const isFocused = useIsFocused();
+  const insets = useSafeAreaInsets();
   const [sheetVisible, setSheetVisible] = useState(false);
   const [result, setResult] = useState<ScanResultPayload | null>(null);
   const lastScannedRef = useRef<string | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
   const [mountError, setMountError] = useState<string | null>(null);
+  const [torchEnabled, setTorchEnabled] = useState(false);
+  const [facing, setFacing] = useState<'front' | 'back'>('back');
 
   useEffect(() => {
     if (!permission) {
@@ -173,7 +176,8 @@ export default function ScanScreen() {
 
       <CameraView
         style={StyleSheet.absoluteFillObject}
-        facing="back"
+        facing={facing}
+        enableTorch={torchEnabled}
         barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
         active={isFocused && !sheetVisible && !mountError}
         onBarcodeScanned={scanningActive ? handleBarcodeScanned : undefined}
@@ -190,13 +194,48 @@ export default function ScanScreen() {
       <SafeAreaView style={styles.overlay} pointerEvents="box-none">
         <View style={[styles.header, { marginTop: 24 }]}>
           <Text style={{ color: Palette.white, fontSize: 24, fontWeight: '800' }}>Scan package QR</Text>
-          {/* <Text style={{ color: Palette.gray300, fontSize: 14, marginTop: 6 }}>
-            Align the code inside the frame until details appear.
-          </Text> */}
+         
+        </View>
+
+        <View style={[styles.controls, { top: insets.top + 16 }]} pointerEvents="box-none">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={torchEnabled ? 'Turn torch off' : 'Turn torch on'}
+            onPress={() => setTorchEnabled((v) => !v)}
+            disabled={facing === 'front'}
+            style={[
+              styles.toggles,
+              {
+                backgroundColor:
+                  facing === 'front'
+                    ? 'rgba(0,0,0,0.35)'
+                    : torchEnabled
+                      ? Colors[scheme].tint
+                      : 'rgba(0,0,0,0.35)',
+                opacity: facing === 'front' ? 0.6 : 1,
+              },
+            ]}
+          >
+            <FontAwesome name="bolt" size={20} color={Palette.white} />
+          </Pressable>
+
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Flip camera"
+            onPress={() => setFacing((prev) => (prev === 'back' ? 'front' : 'back'))}
+            style={[styles.toggles, { backgroundColor: 'rgba(0,0,0,0.35)', marginLeft: 12 }]}
+          >
+            <FontAwesome name="refresh" size={20} color={Palette.white} />
+          </Pressable>
         </View>
 
         <View style={styles.frameContainer} pointerEvents="none">
-          <View style={styles.frame} />
+          <View style={styles.frame}>
+            <View style={[styles.corner, styles.cornerTopLeft]} />
+            <View style={[styles.corner, styles.cornerTopRight]} />
+            <View style={[styles.corner, styles.cornerBottomLeft]} />
+            <View style={[styles.corner, styles.cornerBottomRight]} />
+          </View>
         </View>
 
         <View style={styles.footer}>
@@ -251,6 +290,12 @@ export default function ScanScreen() {
   );
 }
 
+// Dimensions for the QR code frame
+const FRAME_RADIUS = 24;
+const CORNER_LENGTH = 30;
+const CORNER_RADIUS = 16;
+const CORNER_STROKE = 4;
+
 const styles = StyleSheet.create({
   root: {
     flex: 1,
@@ -268,7 +313,19 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   header: {
+    alignSelf:'flex-start'
+  },
+  controls: {
+    position: 'absolute',
+    right: 16,
+    flexDirection: 'row',
+  },
+  toggles: {
+    width: 48,
+    height: 48,
+    borderRadius: 999,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   frameContainer: {
     flex: 1,
@@ -279,10 +336,46 @@ const styles = StyleSheet.create({
     width: '70%',
     maxWidth: 320,
     aspectRatio: 1,
-    borderRadius: 24,
-    borderWidth: 2,
+    position: 'relative',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: FRAME_RADIUS,
+  },
+  
+  corner: {
+    position: 'absolute',
+    width: CORNER_LENGTH,
+    height: CORNER_LENGTH,
     borderColor: Palette.white,
-    backgroundColor: 'rgba(0,0,0,0.12)',
+    borderRadius: 0,
+  },
+  cornerTopLeft: {
+    top: 0,
+    left: 0,
+    borderTopWidth: CORNER_STROKE,
+    borderLeftWidth: CORNER_STROKE,
+    borderTopLeftRadius: CORNER_RADIUS,
+  },
+  cornerTopRight: {
+    top: 0,
+    right: 0,
+    borderTopWidth: CORNER_STROKE,
+    borderRightWidth: CORNER_STROKE,
+    borderTopRightRadius: CORNER_RADIUS,
+  },
+  cornerBottomLeft: {
+    bottom: 0,
+    left: 0,
+    borderBottomWidth: CORNER_STROKE,
+    borderLeftWidth: CORNER_STROKE,
+    borderBottomLeftRadius: CORNER_RADIUS,
+  },
+  cornerBottomRight: {
+    bottom: 0,
+    right: 0,
+    borderBottomWidth: CORNER_STROKE,
+    borderRightWidth: CORNER_STROKE,
+    borderBottomRightRadius: CORNER_RADIUS,
   },
   footer: {
     alignItems: 'center',
