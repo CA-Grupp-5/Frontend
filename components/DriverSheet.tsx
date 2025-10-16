@@ -95,7 +95,7 @@ const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
             </View>
           </View>
 
-          {/* Actions */}
+          {/* Call button */}
           <Pressable
             onPress={() => {
               Linking.openURL('tel:+15555550123');//remember to change this to real phone number when we have it
@@ -114,7 +114,7 @@ const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
               gap: 8,
             }}
           >
-            <FontAwesome name="phone" size={16} color={tint} />
+            <FontAwesome name="phone" size={20} color={tint} />
             <Text style={{ color: Colors[scheme].text, fontWeight: '600' }}>Call</Text>
           </Pressable>
           {/* Packages link */}
@@ -128,7 +128,7 @@ const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
             hitSlop={10}
             style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 16, flexDirection: 'row', gap: 8 }}
           >
-            <FontAwesome name="cube" size={16} color={tint} />
+            <FontAwesome name="cube" size={20} color={tint} />
             <Text style={{ color: scheme === 'dark' ? Palette.gray200 : Palette.gray900, fontWeight: '600' }}>Packages</Text>
           </Pressable>
           <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="Close driver sheet" hitSlop={10} style={{ alignItems: 'center', paddingVertical: 16 }}>

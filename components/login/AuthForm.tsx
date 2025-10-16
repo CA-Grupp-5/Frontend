@@ -44,7 +44,8 @@ function AuthForm() {
   const inputBorderColor = 'rgba(74, 85, 104, 0.8)';
   const placeholderTextColor = 'rgba(160, 174, 192, 0.6)';
   const inactiveCheckboxBorderColor = 'rgba(160, 174, 192, 0.5)';
-  const primaryButtonTextColor = scheme === 'dark' ? '#F9FAFB' : '#111827';
+  // Sign in button is ugly still, will keep for dev and use guest button as main in prod
+  const primaryButtonTextColor = scheme === 'dark' ? '#000000' : '#111827';
 
   const onSubmit = handleSubmit(async ({ email, password, rememberMe }) => {
     if (!password.trim()) {

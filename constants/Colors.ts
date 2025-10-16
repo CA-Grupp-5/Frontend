@@ -1,4 +1,8 @@
-const tintColor = 'hsl(200, 90%, 55%)'; 
+// const tintColor = 'hsl(200, 90%, 55%)'; //old lighter version
+const tintColor = 'hsl(200, 90%, 50%)';
+// const tintColor = '#169ED4'; 
+// const tintColor = 'hsl(197, 90%, 46%)'; 
+// const tintColor = 'hsl(197, 82%, 43%)'; 
 
 export type ThemeName = 'light' | 'dark';
 
