@@ -11,12 +11,12 @@ export type ParsedScanPayload = {
 };
 
 // Allow number-like strings to become numbers
-const numberLike = z.preprocess((v) => {
-  if (typeof v === 'string' && v.trim().length > 0) {
-    const n = Number(v);
-    return Number.isFinite(n) ? n : v;
+const numberLike = z.preprocess((value) => {
+  if (typeof value === 'string' && value.trim().length > 0) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : value;
   }
-  return v;
+  return value;
 }, z.number());
 
 // Accept alias keys from various QR payload variants
@@ -67,4 +67,3 @@ export function parseScannedPayload(raw: string): ParsedScanPayload {
     return { raw };
   }
 }
-

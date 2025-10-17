@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { MMKV } from 'react-native-mmkv';
 
-const storage = new MMKV();
+// Dedicated MMKV instance for auth 
+const storage = new MMKV({ id: 'auth' });
 
 // Custom MMKV storage adapter for Zustand
 const mmkvStorage = {

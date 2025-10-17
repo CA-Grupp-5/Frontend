@@ -24,7 +24,7 @@ export default function ToggleTheme({ colorScheme, setColorScheme, theme }: Prop
       accessibilityState={{ selected }}
       hitSlop={10}
       onPress={async () => {
-        setColorScheme(theme as 'light' | 'dark' | 'system');
+        setColorScheme(theme as 'light' | 'dark');
       }}
     >
       <View style={styles.leftWrap}>

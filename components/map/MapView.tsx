@@ -8,6 +8,7 @@ import Constants from 'expo-constants';
 import { geocodeAddress, type LngLat } from '@/lib/mapbox';
 import { computeBoundsFromRoute, expandBoundsAround } from '@/lib/map-geometry';
 import MapStyleToggle from '@/components/map/MapStyleToggle';
+import { useSettingsStore, type MapStyleOption } from '@/stores/settingsStore';
 
 const BOUNDS_PADDING = 48;
 const HOME_ADDRESS = 'Sveavagen 168, 113 46 Stockholm, Sweden' as const;
@@ -37,8 +38,9 @@ export default function MapView({ onDriverPress, onEtaChange }: MapViewProps) {
     ],
     [],
   );
-  const [styleIndex, setStyleIndex] = useState(0);
-  const currentStyle = STYLE_OPTIONS[styleIndex];
+  const mapStyle = useSettingsStore((s) => s.mapStyle);
+  const setMapStyle = useSettingsStore((s) => s.setMapStyle);
+  const currentStyle = STYLE_OPTIONS.find((option) => option.key === mapStyle) ?? STYLE_OPTIONS[0];
 
   const [home, setHome] = useState<LngLat | null>(null);
   const [routeGeom, setRouteGeom] = useState<any | null>(null);
@@ -214,7 +216,12 @@ export default function MapView({ onDriverPress, onEtaChange }: MapViewProps) {
       <MapStyleToggle
         label={currentStyle.label}
         tint={tint}
-        onPress={() => setStyleIndex(prev => (prev + 1) % STYLE_OPTIONS.length)}
+        onPress={() => {
+          const currentIndex = STYLE_OPTIONS.findIndex((option) => option.key === mapStyle);
+          const next = (currentIndex + 1) % STYLE_OPTIONS.length;
+          const nextKey = STYLE_OPTIONS[next].key as MapStyleOption;
+          setMapStyle(nextKey);
+        }}
       />
     </>
   );

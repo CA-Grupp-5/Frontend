@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, StatusBar, StyleSheet, Text, View, Vibration } from 'react-native';
 import { CameraView, useCameraPermissions, type BarcodeScanningResult, type CameraMountError } from 'expo-camera';
 import { useColorScheme } from 'nativewind';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -9,6 +9,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import Colors, { Palette } from '@/constants/Colors';
 import ScanResultSheet, { type ScanResultPayload } from '@/components/ScanResultSheet';
 import { parseScannedPayload } from '@/lib/scan';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 export default function ScanScreen() {
   const { colorScheme } = useColorScheme();
@@ -16,12 +17,13 @@ export default function ScanScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
+  const vibrateOnScan = useSettingsStore((s) => s.scannerVibrateOnScan);
   const [sheetVisible, setSheetVisible] = useState(false);
   const [result, setResult] = useState<ScanResultPayload | null>(null);
   const lastScannedRef = useRef<string | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
   const [mountError, setMountError] = useState<string | null>(null);
-  const [torchEnabled, setTorchEnabled] = useState(false);
+  const [torchEnabled, setTorchEnabled] = useState<boolean>(false);
   const [facing, setFacing] = useState<'front' | 'back'>('back');
 
   useEffect(() => {
@@ -55,10 +57,13 @@ export default function ScanScreen() {
       if (scan.data === lastScannedRef.current) return;
       lastScannedRef.current = scan.data;
       const parsed = parseScannedPayload(scan.data);
+      if (vibrateOnScan) {
+        Vibration.vibrate(50);
+      }
       setResult(parsed);
       setSheetVisible(true);
     },
-    [sheetVisible],
+    [sheetVisible, vibrateOnScan],
   );
 
   const handleCloseSheet = useCallback(() => {
@@ -156,7 +161,7 @@ export default function ScanScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={torchEnabled ? 'Turn torch off' : 'Turn torch on'}
-            onPress={() => setTorchEnabled((v) => !v)}
+            onPress={() => setTorchEnabled((prev) => !prev)}
             disabled={facing === 'front'}
             style={[
               styles.toggles,
