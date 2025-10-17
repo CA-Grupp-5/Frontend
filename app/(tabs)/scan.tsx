@@ -8,52 +8,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Colors, { Palette } from '@/constants/Colors';
 import ScanResultSheet, { type ScanResultPayload } from '@/components/ScanResultSheet';
-
-type ParsedPayload = Omit<ScanResultPayload, 'raw'> & { raw: string };
-
-const parseScannedPayload = (raw: string): ParsedPayload => {
-  if (!raw) return { raw };
-  try {
-    const candidate = JSON.parse(raw);
-    if (candidate && typeof candidate === 'object') {
-      const normalized = candidate as Record<string, unknown>;
-      const temp =
-        typeof normalized.temperatureC === 'number'
-          ? normalized.temperatureC
-          : typeof normalized.temperature === 'number'
-            ? normalized.temperature
-            : undefined;
-      const humid =
-        typeof normalized.humidity === 'number'
-          ? normalized.humidity
-          : typeof normalized.rh === 'number'
-            ? normalized.rh
-            : undefined;
-      return {
-        packageId: String(normalized.packageId ?? normalized.id ?? ''),
-        recipient:
-          typeof normalized.recipient === 'string'
-            ? normalized.recipient
-            : typeof normalized.customer === 'string'
-              ? normalized.customer
-              : undefined,
-        address:
-          typeof normalized.address === 'string'
-            ? normalized.address
-            : typeof normalized.destination === 'string'
-              ? normalized.destination
-              : undefined,
-        notes: typeof normalized.notes === 'string' ? normalized.notes : undefined,
-        temperatureC: temp as number | undefined,
-        humidity: humid as number | undefined,
-        raw,
-      };
-    }
-  } catch {
-    // Ignore parsing errors; fall back to raw string mode.
-  }
-  return { raw };
-};
+import { parseScannedPayload } from '@/lib/scan';
 
 export default function ScanScreen() {
   const { colorScheme } = useColorScheme();

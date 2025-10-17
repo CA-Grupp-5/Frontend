@@ -182,9 +182,7 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
                         <FontAwesome name={item.icon} size={18} color={Palette.white} />
                       </View>
                       <Text style={{ color: muted, fontSize: 12 }}>{item.label}</Text>
-                      <Text style={{ color: text, fontWeight: '700', fontSize: 16 }}>
-                        {item.label === 'Temperature' ? item.value.replace(/\uFFFD+\uFFFD?C/g, '°C') : item.value}
-                      </Text>
+                      <Text style={{ color: text, fontWeight: '700', fontSize: 16 }}>{item.value}</Text>
                     </View>
                   ))}
                 </View>

@@ -92,7 +92,7 @@ export default function MapView({ onDriverPress, onEtaChange }: MapViewProps) {
     if (!token || !home) return;
 
     routeBoundsAppliedRef.current = false;
-
+// Not a huge deal to have public token here, but could be more secure
     const fetchRoute = async () => {
       try {
         const url = `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${DRIVER_POSITION[0]},${DRIVER_POSITION[1]};${home[0]},${home[1]}?geometries=geojson&overview=full&annotations=duration,distance&steps=false&access_token=${token}`;
