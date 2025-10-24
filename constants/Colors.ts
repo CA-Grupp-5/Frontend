@@ -1,5 +1,7 @@
 // const tintColor = 'hsl(200, 90%, 55%)'; //old lighter version
-const tintColor = 'hsl(200, 90%, 50%)';
+// const tintColor = 'hsl(200, 90%, 50%)'; //settled for a shade that still conveys cold while improving wcag
+// const tintColor = 'hsl(200, 90%, 50%)'; //settled for a shade that still conveys cold while improving wcag
+const tintColor = 'hsl(200, 90%, 46%)'; //settled for a shade that still conveys cold while improving wcag
 // const tintColor = '#169ED4'; 
 // const tintColor = 'hsl(197, 90%, 46%)'; 
 // const tintColor = 'hsl(197, 82%, 43%)'; 
@@ -10,20 +12,22 @@ export type ThemeName = 'light' | 'dark';
 export const Palette = {
   // Base
   white: 'hsl(0, 0%, 100%)',
+  // whiteSoft : 'hsl(200, 90%, 50%)',
+  whiteSoft : 'hsl(0, 0%, 90%)',
   black: 'hsl(0, 0%, 0%)',
 
-  // App-specific tint
+  // App-specific tint/brand color
   tint: tintColor,
 
-  // Grays used throughout components (HSL equivalents of existing hex values)
-  gray50: 'hsl(210, 20%, 98%)',   // #f9fafb
-  gray900: 'hsl(221, 39%, 11%)', // #111827
-  gray700: 'hsl(217, 19%, 27%)', // #374151
-  gray600: 'hsl(215, 14%, 34%)', // #4b5563
-  gray500: 'hsl(220, 9%, 46%)',  // #6b7280
-  gray400: 'hsl(218, 11%, 65%)', // #9ca3af
-  gray300: 'hsl(216, 12%, 84%)', // #d1d5db
-  gray200: 'hsl(220, 13%, 91%)', // #e5e7eb
+  // Grays used throughout components 
+  gray50: 'hsl(210, 20%, 98%)',  
+  gray900: 'hsl(221, 39%, 11%)',
+  gray700: 'hsl(217, 19%, 27%)', 
+  gray600: 'hsl(215, 14%, 34%)', 
+  gray500: 'hsl(220, 9%, 46%)',  
+  gray400: 'hsl(218, 11%, 65%)', 
+  gray300: 'hsl(216, 12%, 84%)', 
+  gray200: 'hsl(220, 13%, 91%)', 
 
   // Card backgrounds used in DriverSheet
   darkCardBg: 'hsl(219, 30%, 15%)', // #1b2332
@@ -55,7 +59,6 @@ interface ThemeColors  {
   tabIconSelected: string;
   tabBarBackground: string;
   tabBarBorder: string;
-  // Common semantics used in multiple places
   mutedText: string; // subdued text (labels, hints)
   border: string;    // card borders
   divider: string;   // list row separators

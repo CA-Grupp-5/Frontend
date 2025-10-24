@@ -223,8 +223,8 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
                   gap: 10,
                 }}
               >
-                <FontAwesome name="check-circle" size={18} color={Palette.white} />
-                <Text style={{ color: Palette.white, fontWeight: '700', fontSize: 16 }}>
+                <FontAwesome name="check-circle" size={18} color={'hsl(210, 20%, 12%)'} />
+                <Text style={{ color: 'hsl(210, 20%, 12%)', fontWeight: '700', fontSize: 16 }}>
                   Mark as delivered
                 </Text>
               </Pressable>

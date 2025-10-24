@@ -65,6 +65,7 @@ function AuthInputBase(
             },
             inputStyle,
           ]}
+          accessibilityLabel={label}
           placeholderTextColor={placeholderTextColor}
           secureTextEntry={effectiveSecureTextEntry}
           {...inputProps}
@@ -74,6 +75,9 @@ function AuthInputBase(
             style={styles.passwordToggle}
             onPress={() => setIsPasswordVisible((prev) => !prev)}
             activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel={isPasswordVisible ? 'Hide password' : 'Show password'}
+            hitSlop={10}
           >
             <FontAwesome
               name={isPasswordVisible ? 'eye-slash' : 'eye'}

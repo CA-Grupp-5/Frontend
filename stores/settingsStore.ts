@@ -14,11 +14,9 @@ const mmkvStorage = {
 export type MapStyleOption = 'light' | 'dark' | 'satellite';
 
 interface SettingsState {
-  // Map
   mapStyle: MapStyleOption;
   setMapStyle: (style: MapStyleOption) => void;
 
-  // Scanner
   scannerVibrateOnScan: boolean;
   setScannerVibrateOnScan: (enabled: boolean) => void;
 }

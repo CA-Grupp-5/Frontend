@@ -114,7 +114,7 @@ const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
               gap: 8,
             }}
           >
-            <FontAwesome name="phone" size={20} color={tint} />
+            <FontAwesome name="phone" size={20} color={tint} style = {{ marginLeft: -34 }} />
             <Text style={{ color: Colors[scheme].text, fontWeight: '600' }}>Call</Text>
           </Pressable>
           {/* Packages link */}

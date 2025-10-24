@@ -124,7 +124,7 @@ export default function ScanScreen() {
             borderRadius: 999,
           }}
         >
-          <Text style={{ color: Palette.white, fontWeight: '600' }}>Grant permission</Text>
+          <Text style={{ color: 'hsl(210, 20%, 12%)', fontWeight: '600' }}>Grant permission</Text>
         </Pressable>
       </View>
     );
@@ -170,7 +170,7 @@ export default function ScanScreen() {
                   facing === 'front'
                     ? 'rgba(0,0,0,0.35)'
                     : torchEnabled
-                      ? Colors[scheme].tint
+                      ? 'hsl(200, 90%, 46%)'
                       : 'rgba(0,0,0,0.35)',
                 opacity: facing === 'front' ? 0.6 : 1,
               },
@@ -235,7 +235,7 @@ export default function ScanScreen() {
               backgroundColor: Colors[scheme].tint,
             }}
           >
-            <Text style={{ color: Palette.white, fontWeight: '600' }}>Try again</Text>
+            <Text style={{ color: 'hsl(210, 20%, 12%)', fontWeight: '600' }}>Try again</Text>
           </Pressable>
         </View>
       ) : null}

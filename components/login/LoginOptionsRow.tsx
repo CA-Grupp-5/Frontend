@@ -37,12 +37,27 @@ function LoginOptionsRow({
 
   return (
     <View style={[styles.container, style]}>
-      <TouchableOpacity style={styles.rememberButton} onPress={onToggleRememberMe} activeOpacity={0.85}>
+      <TouchableOpacity
+        style={styles.rememberButton}
+        onPress={onToggleRememberMe}
+        activeOpacity={0.85}
+        accessibilityRole="checkbox"
+        accessibilityState={{ checked: rememberMe }}
+        accessibilityLabel={rememberLabel}
+        hitSlop={10}
+      >
         <View style={checkboxStyles}>{rememberMe && <FontAwesome name="check" size={10} color="#fff" />}</View>
         <Text style={[styles.rememberLabel, { color: textColor }, rememberTextStyle]}>{rememberLabel}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={onForgotPassword} disabled={!onForgotPassword} activeOpacity={0.85}>
+      <TouchableOpacity
+        onPress={onForgotPassword}
+        disabled={!onForgotPassword}
+        activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityLabel={forgotLabel}
+        hitSlop={10}
+      >
         <Text style={[styles.forgotLabel, { color: textColor }, forgotTextStyle]}>{forgotLabel}</Text>
       </TouchableOpacity>
     </View>

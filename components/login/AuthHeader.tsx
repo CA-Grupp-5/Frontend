@@ -16,6 +16,7 @@ function AuthHeader({ textColor, subtextColor, borderColor, style }: AuthHeaderP
           <Image
             source={require('../../assets/images/delivra-adaptive.png')}
             style={styles.logo}
+            accessible={false}
           />
         </View>
         <View style={styles.headingContainer}>

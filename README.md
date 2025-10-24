@@ -2,6 +2,8 @@
 
 Modern React Native app using Expo Router, NativeWind (Tailwind for RN), Zustand + MMKV, and Mapbox.
 
+
+
 ### Stack
 
 - Expo SDK 53, React Native 0.79
@@ -75,13 +77,13 @@ Convenience PowerShell scripts live in `./scripts` and are exposed via package s
 - Debug/dev APK (includes expo-dev-client):
 
 ```powershell
-bun run dev
+bun dev
 ```
 
 - Release APK (Gradle release):
 
 ```powershell
-bun run release
+bun release
 ```
 
 These scripts will:
@@ -99,13 +101,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-debu
 
 ### Scripts
 
-- Start dev server (Dev Client + LAN): `bun run start`
-- Start with LAN auto-detection: `bun run sc`
-- Android run: `bun run android`
-- iOS run: `bun run ios`
-- Tests (watch): `bun run test`
-- Lint: `bun run lint`
-- Format: `bun run format`
+- Start dev server (Dev Client + LAN): `bun s`
+- Start dev server with cleared cache (Dev Client + LAN): `bun sclear`
+- Tests (watch): `bun t`
+- Lint: `bun lint`
+- Format: `bun format`
 
 
 ### Package manager
@@ -114,9 +114,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-debu
 
 ### Features in App
 
-- Auth placeholder with Zustand + MMKV (persistent)
+- Auth  with Zustand + MMKV 
 - Theming with light/dark toggle
-- Tabs: Home, Map (Mapbox), Settings
+- Tabs: Home, Map (Mapbox),Scan, Settings
 - Map: driver marker, geocoded home address, route line + ETA, style toggle
 - Packages modal with grid/card/list views and a history modal
 
@@ -129,11 +129,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-debu
 - `constants/` Theme colors
 - `global.css` Tailwind entry used by `metro.config.js`
 
-### Testing & Linting
 
-- Unit tests: `bun run test`
-- ESLint: `bun run lint`
-- Prettier write/check: `bun run format` / `bun run format:check`
 
 ### Notes / Roadmap
 

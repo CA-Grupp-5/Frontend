@@ -32,7 +32,7 @@ export default function ViewModeSelector({ mode, onChange, scheme }: Props) {
           <Pressable
             key={m}
             onPress={() => onChange(m)}
-            hitSlop={8}
+            hitSlop={10}
             accessibilityRole="button"
             accessibilityLabel={`Set view to ${m}`}
             style={[
