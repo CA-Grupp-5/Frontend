@@ -8,6 +8,7 @@ type Props = {
   item: PackageItem;
   scheme: ThemeName;
   onHistory: (id: string) => void;
+  index?: number;
 };
 
 type PackageItem = {
@@ -17,15 +18,18 @@ type PackageItem = {
   humidity: string;
 };
 
-export default React.memo(function ListItem({ item, scheme, onHistory }: Props) {
+export default React.memo(function ListItem({ item, scheme, onHistory, index = 0 }: Props) {
   const tint = Colors[scheme].tint;
   const text = Colors[scheme].text;
   const muted = Colors[scheme].mutedText;
   const divider = Colors[scheme].divider;
   const statusColor = item.status === 'good' ? Palette.success : Palette.destructive;
+  const rowBg = scheme === 'light'
+    ? (index % 2 === 0 ? Palette.gray50 : Colors[scheme].background)
+    : (index % 2 === 0 ? Colors[scheme].surface : Colors[scheme].background);
 
   return (
-    <View style={[styles.row, { borderBottomColor: divider }]}>
+    <View style={[styles.row, { borderBottomColor: divider, backgroundColor: rowBg }]}>
       <View style={[styles.statusBar, { backgroundColor: statusColor }]} />
 
       <View style={styles.idBlock}>

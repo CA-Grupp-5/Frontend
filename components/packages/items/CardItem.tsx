@@ -24,13 +24,14 @@ export default React.memo(function CardItem({ item, scheme, onHistory }: Props) 
   const border = Colors[scheme].border;
   const cardBg = Colors[scheme].surface;
   const statusColor = item.status === 'good' ? Palette.success : Palette.destructive;
+  const brandStrong = scheme === 'light' ? (Palette.highContrastTint ) : tint;
 
   return (
-    <View style={[styles.card, { backgroundColor: cardBg, borderColor: border }]}>
+    <View style={[styles.card, { backgroundColor: cardBg, borderColor: border, shadowColor: scheme === 'light' ? '#000' : undefined, shadowOpacity: scheme === 'light' ? 0.04 : 0, shadowRadius: scheme === 'light' ? 8 : 0, shadowOffset: scheme === 'light' ? { width: 0, height: 2 } as any : undefined }]}>
       <View style={styles.headerRow}>
         <View style={styles.headerLeft}>
           <View style={[styles.iconBox, { backgroundColor: border }]}>
-            <FontAwesome name="cube" size={24} color={tint} />
+            <FontAwesome name="cube" size={24} color={brandStrong} />
           </View>
           <View>
             <Text style={[styles.title, { color: text }]}>{item.id}</Text>
@@ -45,7 +46,7 @@ export default React.memo(function CardItem({ item, scheme, onHistory }: Props) 
       <View style={styles.metricsRow}>
         <View style={[styles.metricCard, { backgroundColor: border }]}>
           <View style={styles.metricHeader}>
-            <FontAwesome name="thermometer-half" size={18} color={tint} />
+            <FontAwesome name="thermometer-half" size={18} color={brandStrong} />
             <Text style={[styles.metricLabel, { color: muted }]}>Temperature</Text>
           </View>
           <Text style={[styles.metricBig, { color: text }]}>
@@ -54,7 +55,7 @@ export default React.memo(function CardItem({ item, scheme, onHistory }: Props) 
         </View>
         <View style={[styles.metricCard, { backgroundColor: border }]}>
           <View style={styles.metricHeader}>
-            <FontAwesome name="tint" size={18} color={tint} />
+            <FontAwesome name="tint" size={18} color={brandStrong} />
             <Text style={[styles.metricLabel, { color: muted }]}>Humidity</Text>
           </View>
           <Text style={[styles.metricBig, { color: text }]}>{item.humidity}%</Text>
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   metricBig: {
-    fontSize: 22,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '700',
   },
 });

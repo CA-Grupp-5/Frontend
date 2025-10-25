@@ -26,9 +26,23 @@ export default React.memo(function GridItem({ item, scheme, onHistory }: Props) 
   const statusColor = item.status === 'good' ? Palette.success : Palette.destructive;
 
   return (
-    <View style={[styles.card, { backgroundColor: cardBg, borderColor: border }]}>
+    <View style={[
+      styles.card,
+      {
+        backgroundColor: cardBg,
+        borderColor: border,
+        shadowColor: scheme === 'light' ? '#000' : undefined,
+        shadowOpacity: scheme === 'light' ? 0.04 : 0,
+        shadowRadius: scheme === 'light' ? 6 : 0,
+        shadowOffset: scheme === 'light' ? { width: 0, height: 2 } as any : undefined,
+      },
+    ]}>
       <View style={styles.headerRow}>
-        <Text style={[styles.idText, { color: muted }]}>{item.id}</Text>
+        <Text style={[
+          styles.idText,
+          { color: scheme === 'light' ? text : muted },
+          scheme === 'light' ? { fontWeight: '700' } : null,
+        ]}>{item.id}</Text>
         <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
       </View>
 

@@ -48,7 +48,9 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
     [scheme, onHistory]
   );
   const renderListItem = useCallback(
-    ({ item }: { item: PackageItem }) => <ListItem item={item} scheme={scheme} onHistory={onHistory} />,
+    ({ item, index }: { item: PackageItem; index: number }) => (
+      <ListItem item={item} scheme={scheme} onHistory={onHistory} index={index} />
+    ),
     [scheme, onHistory]
   );
 

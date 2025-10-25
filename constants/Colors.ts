@@ -39,6 +39,8 @@ export const Palette = {
   // Status (used across multiple components)
   success: 'hsl(142, 71%, 45%)',
   destructive: 'hsl(0, 84%, 60%)',
+  highContrastTint:'hsl(200, 90%, 38%)',
+
 
   // Overlay
   backdropOverlay: 'hsla(0, 0%, 0%, 0.5)', // rgba(0,0,0,0.5)

@@ -54,7 +54,22 @@ const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
           transform: [{ translateY }],
         }}
       >
-        <SafeAreaView edges={['bottom']} style={{ backgroundColor: Colors[scheme].tabBarBackground, paddingHorizontal: 16, paddingTop: 8, borderTopLeftRadius: 24, borderTopRightRadius: 24 }}>
+        <SafeAreaView
+          edges={['bottom']}
+          style={{
+            backgroundColor: Colors[scheme].tabBarBackground,
+            paddingHorizontal: 16,
+            paddingTop: 8,
+            borderTopLeftRadius: 24,
+            borderTopRightRadius: 24,
+            borderTopWidth: scheme === 'light' ? 1 : 0,
+            borderColor: Colors[scheme].tabBarBorder,
+            shadowColor: scheme === 'light' ? '#000' : undefined,
+            shadowOpacity: scheme === 'light' ? 0.06 : 0,
+            shadowRadius: scheme === 'light' ? 12 : 0,
+            shadowOffset: scheme === 'light' ? { width: 0, height: -2 } as any : undefined,
+          }}
+        >
           {/* Grabber */}
           <View style={{ alignItems: 'center', paddingBottom: 8 }}>
             <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: Colors[scheme].divider }} />
@@ -79,14 +94,36 @@ const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
 
           {/* Stats */}
           <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16 }}>
-            <View style={{ flex: 1, backgroundColor: cardBg, borderRadius: 16, padding: 16 }}>
+            <View style={{
+              flex: 1,
+              backgroundColor: cardBg,
+              borderRadius: 16,
+              padding: 16,
+              borderWidth: scheme === 'light' ? 1 : 0,
+              borderColor: Colors[scheme].border,
+              shadowColor: scheme === 'light' ? '#000' : undefined,
+              shadowOpacity: scheme === 'light' ? 0.04 : 0,
+              shadowRadius: scheme === 'light' ? 6 : 0,
+              shadowOffset: scheme === 'light' ? { width: 0, height: 2 } as any : undefined,
+            }}>
               <View style={{ alignItems: 'center', gap: 8 }}>
                 <FontAwesome name="clock-o" size={20} color={tint} />
                 <Text style={{ color: Colors[scheme].text, fontSize: 22, fontWeight: '800' }}>{driver.eta}</Text>
                 <Text style={{ color: Colors[scheme].mutedText, fontSize: 12 }}>ETA</Text>
               </View>
             </View>
-            <View style={{ flex: 1, backgroundColor: cardBg, borderRadius: 16, padding: 16 }}>
+            <View style={{
+              flex: 1,
+              backgroundColor: cardBg,
+              borderRadius: 16,
+              padding: 16,
+              borderWidth: scheme === 'light' ? 1 : 0,
+              borderColor: Colors[scheme].border,
+              shadowColor: scheme === 'light' ? '#000' : undefined,
+              shadowOpacity: scheme === 'light' ? 0.04 : 0,
+              shadowRadius: scheme === 'light' ? 6 : 0,
+              shadowOffset: scheme === 'light' ? { width: 0, height: 2 } as any : undefined,
+            }}>
               <View style={{ alignItems: 'center', gap: 8 }}>
                 <FontAwesome name="paper-plane" size={20} color={tint} />
                 <Text style={{ color: Colors[scheme].text, fontSize: 22, fontWeight: '800' }}>{driver.progress}%</Text>
@@ -95,7 +132,7 @@ const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
             </View>
           </View>
 
-          {/* Call button */}
+          {/* Call button: outline (dark) vs filled (light) */}
           <Pressable
             onPress={() => {
               Linking.openURL('tel:+15555550123');//remember to change this to real phone number when we have it
@@ -104,18 +141,23 @@ const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
             accessibilityLabel="Call driver"
             hitSlop={10}
             style={{
-              borderWidth: 1,
+              borderWidth: scheme === 'light' ? 0 : 1,
               borderColor: tint,
+              backgroundColor: scheme === 'light' ? Palette.highContrastTint : undefined,
               borderRadius: 12,
               paddingVertical: 12,
               alignItems: 'center',
               justifyContent: 'center',
               flexDirection: 'row',
               gap: 8,
+              shadowColor: scheme === 'light' ? '#000' : undefined,
+              shadowOpacity: scheme === 'light' ? 0.08 : 0,
+              shadowRadius: scheme === 'light' ? 8 : 0,
+              shadowOffset: scheme === 'light' ? { width: 0, height: 2 } as any : undefined,
             }}
           >
-            <FontAwesome name="phone" size={20} color={tint} style = {{ marginLeft: -34 }} />
-            <Text style={{ color: Colors[scheme].text, fontWeight: '600' }}>Call</Text>
+            <FontAwesome name="phone" size={20} color={scheme === 'light' ? Palette.white : tint} style = {{ marginLeft: -34 }} />
+            <Text style={{ color: scheme === 'light' ? Palette.white : Colors[scheme].text, fontWeight: '600' }}>Call</Text>
           </Pressable>
           {/* Packages link */}
           <Pressable
@@ -129,10 +171,10 @@ const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
             style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 16, flexDirection: 'row', gap: 8 }}
           >
             <FontAwesome name="cube" size={20} color={tint} />
-            <Text style={{ color: scheme === 'dark' ? Palette.gray200 : Palette.gray900, fontWeight: '600' }}>Packages</Text>
+            <Text style={{ color: Colors[scheme].text, fontWeight: '600' }}>Packages</Text>
           </Pressable>
           <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="Close driver sheet" hitSlop={10} style={{ alignItems: 'center', paddingVertical: 16 }}>
-            <Text style={{ color: scheme === 'dark' ? Palette.gray200 : Palette.gray900, fontWeight: '600' }}>Close</Text>
+            <Text style={{ color: Colors[scheme].text, fontWeight: '600' }}>Close</Text>
           </Pressable>
         </SafeAreaView>
       </Animated.View>

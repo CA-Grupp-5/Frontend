@@ -22,6 +22,7 @@ export default function ViewModeSelector({ mode, onChange, scheme }: Props) {
   const tint = Colors[scheme].tint;
   const border = Colors[scheme].border;
   const muted = Colors[scheme].mutedText;
+  
 
   return (
     <View style={[styles.container, { borderBottomColor: Colors[scheme].divider }]}> 
@@ -37,13 +38,15 @@ export default function ViewModeSelector({ mode, onChange, scheme }: Props) {
             accessibilityLabel={`Set view to ${m}`}
             style={[
               styles.option,
-              active ? { backgroundColor: tint, borderWidth: 0 } : { borderColor: border, borderWidth: 1 },
+              active
+                ? { backgroundColor: scheme === 'light' ? Palette.highContrastTint : tint, borderWidth: 0 }
+                : { borderColor: border, borderWidth: 1 },
             ]}
           >
             <FontAwesome name={icon as any} size={14} color={active ? Palette.white : text} />
             <Text style={[
               styles.optionText,
-              { color: active ? ('hsl(210, 20%, 12%)' as any) : Colors[scheme].text },
+              { color: active ? Palette.white : Colors[scheme].text },
             ]}>{m}</Text>
           </Pressable>
         );
