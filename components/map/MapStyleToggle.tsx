@@ -14,6 +14,7 @@ export default function MapStyleToggle({ label, tint, onPress }: Props) {
   const { colorScheme } = useColorScheme();
   const theme = colorScheme ?? 'light';
   const isDark = theme === 'dark';
+  const iconColor = isDark ? tint : ('hsl(220, 18%, 22%)' as any);
 
   return (
     <View style={{ position: 'absolute', right: 16, bottom: 16, zIndex: 10 }} pointerEvents="box-none">
@@ -40,7 +41,7 @@ export default function MapStyleToggle({ label, tint, onPress }: Props) {
           elevation: 3,
         }}
       >
-        <FontAwesome name="map" size={16} color={tint} />
+        <FontAwesome name="map" size={16} color={iconColor} />
         <Text style={{ color: Colors[theme].text, fontWeight: '600' }}>{label}</Text>
       </Pressable>
     </View>

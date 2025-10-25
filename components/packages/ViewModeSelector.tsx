@@ -41,7 +41,10 @@ export default function ViewModeSelector({ mode, onChange, scheme }: Props) {
             ]}
           >
             <FontAwesome name={icon as any} size={14} color={active ? Palette.white : text} />
-            <Text style={[styles.optionText, { color: Colors[scheme].text }]}>{m}</Text>
+            <Text style={[
+              styles.optionText,
+              { color: active ? ('hsl(210, 20%, 12%)' as any) : Colors[scheme].text },
+            ]}>{m}</Text>
           </Pressable>
         );
       })}

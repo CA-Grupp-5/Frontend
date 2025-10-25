@@ -8,6 +8,7 @@ import Constants from 'expo-constants';
 import { geocodeAddress, type LngLat } from '@/lib/mapbox';
 import { computeBoundsFromRoute, expandBoundsAround } from '@/lib/map-geometry';
 import MapStyleToggle from '@/components/map/MapStyleToggle';
+import { useDeliveryStore } from '@/stores/deliveryStore';
 import { useSettingsStore, type MapStyleOption } from '@/stores/settingsStore';
 
 const BOUNDS_PADDING = 48;
@@ -45,10 +46,11 @@ export default function MapView({ onDriverPress, onEtaChange }: MapViewProps) {
   const [home, setHome] = useState<LngLat | null>(null);
   const [routeGeom, setRouteGeom] = useState<any | null>(null);
   const [eta, setEta] = useState<string>('');
-
+  const setEtaStore = useDeliveryStore((s) => s.setEta);
   useEffect(() => {
     onEtaChange?.(eta);
-  }, [eta, onEtaChange]);
+    setEtaStore(eta);
+  }, [eta, onEtaChange, setEtaStore]);
 
   const defaultBounds = useMemo(() => expandBoundsAround(DRIVER_POSITION, 0.12, 0.08), []);
 
