@@ -20,7 +20,8 @@ export default function TabTwoScreen() {
   const setScannerVibrateOnScan = useSettingsStore((s) => s.setScannerVibrateOnScan);
 
   return (
-    <SafeAreaView className="flex-1 pt-2 items-center justify-start bg-white dark:bg-black">
+    // try gray or stone or zinc 200 
+    <SafeAreaView className="flex-1 pt-2 items-center justify-start bg-gray-200 dark:bg-black">
       <Text className="text-xl font-bold text-dark dark:text-white">Settings</Text>
       {/* THEME SETTINGS */}
       <View className="flex w-full items-center justify-center my-8" style={{ gap: 2 }}>
