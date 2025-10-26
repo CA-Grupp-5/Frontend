@@ -32,7 +32,7 @@ function AuthInputBase(
     backgroundColor,
     borderColor,
     secureToggle = false,
-    placeholderTextColor = 'rgba(160, 174, 192, 0.6)',
+    placeholderTextColor = '#4b5563',
     containerStyle,
     labelStyle,
     style: inputStyle,

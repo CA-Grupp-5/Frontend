@@ -17,40 +17,6 @@ module.exports = {
         sm: 'calc(0.5rem - 4px)',
       },
       colors: {
-        // Original theme colors
-        accent: {
-          DEFAULT: '#eaffff',
-          foreground: '#1a1a1a',
-        },
-        background: '#0d1c11',
-        border: '#1a332a',
-        card: {
-          DEFAULT: '#102314',
-          foreground: '#e4f3f4',
-        },
-        destructive: {
-          DEFAULT: '#26a879',
-          foreground: '#ffffff',
-        },
-        foreground: '#a9ffea',
-        input: '#243f34',
-        muted: {
-          DEFAULT: '#1a1e19',
-          foreground: '#b3b3c0',
-        },
-        popover: {
-          DEFAULT: '#1c1e19',
-          foreground: '#e4f3f4',
-        },
-        primary: {
-          DEFAULT: '#62dfa0',
-          foreground: '#ffffff',
-        },
-        ring: '#274b36',
-        secondary: {
-          DEFAULT: '#1cd7a2',
-          foreground: '#ffffff',
-        },
         
         // Palette colors from Colors.ts
         palette: {

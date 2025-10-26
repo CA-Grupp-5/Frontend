@@ -25,9 +25,21 @@ export default function ScanScreen() {
   const [mountError, setMountError] = useState<string | null>(null);
   const [torchEnabled, setTorchEnabled] = useState<boolean>(false);
   const [facing, setFacing] = useState<'front' | 'back'>('back');
+  const activationStartRef = useRef<number | null>(null);
+  const [cameraKey, setCameraKey] = useState(0);
+  const [retryCount, setRetryCount] = useState(0);
+
+  const devLog = (...args: any[]) => {
+    // eslint-disable-next-line 
+    if (__DEV__) {
+      // Prefix logs for easier filtering in native logs
+      console.log('[ScanCamera]', ...args);
+    }
+  };
 
   useEffect(() => {
     if (!permission) {
+      devLog('Requesting camera permission (initial)');
       requestPermission().catch(() => {});
     }
   }, [permission, requestPermission]);
@@ -89,7 +101,60 @@ export default function ScanScreen() {
     [permission?.granted, sheetVisible, cameraReady, mountError, isFocused],
   );
 
+  const cameraActive = useMemo(
+    () => Boolean(isFocused && permission?.granted && !mountError),
+    [isFocused, permission?.granted, mountError],
+  );
+
+  // State change logs 
+  useEffect(() => { devLog('isFocused ->', isFocused); }, [isFocused]);
+  useEffect(() => { devLog('permission.granted ->', permission?.granted); }, [permission?.granted]);
+  useEffect(() => { devLog('sheetVisible ->', sheetVisible); }, [sheetVisible]);
+  useEffect(() => { devLog('mountError ->', mountError); }, [mountError]);
+  useEffect(() => { devLog('cameraReady ->', cameraReady); }, [cameraReady]);
+  useEffect(() => { devLog('facing ->', facing); }, [facing]);
+  useEffect(() => { devLog('torchEnabled ->', torchEnabled); }, [torchEnabled]);
+  useEffect(() => {
+    devLog('cameraActive ->', cameraActive);
+    if (cameraActive) {
+      activationStartRef.current = Date.now();
+    } else {
+      activationStartRef.current = null;
+    }
+  }, [cameraActive]);
+
+  useEffect(() => { devLog('scanningActive ->', scanningActive); }, [scanningActive]);
+  useEffect(() => { devLog('cameraKey ->', cameraKey); }, [cameraKey]);
+  useEffect(() => { devLog('retryCount ->', retryCount); }, [retryCount]);
+
+  // Watchdog: if active but not ready within 4s, log a snapshot and auto-remount in dev
+  useEffect(() => {
+    if (!cameraActive || cameraReady) return;
+    const t = setTimeout(() => {
+      if (!cameraReady && cameraActive) {
+        devLog('Watchdog: camera not ready after 4000ms', {
+          isFocused,
+          granted: permission?.granted,
+          sheetVisible,
+          mountError,
+          facing,
+          torchEnabled,
+        });
+        // eslint-disable-next-line
+        if (__DEV__ && retryCount < 2) {
+          devLog('Watchdog: auto-remounting camera (dev)', { retryCount });
+          setRetryCount((c) => c + 1);
+          setCameraReady(false);
+          setMountError(null);
+          setCameraKey((k) => k + 1);
+        }
+      }
+    }, 4000);
+    return () => clearTimeout(t);
+  }, [cameraActive, cameraReady, isFocused, permission?.granted, sheetVisible, mountError, facing, torchEnabled, retryCount]);
+
   if (!permission) {
+    devLog('UI: Preparing camera (permission unresolved)');
     return (
       <View style={[styles.centered, { backgroundColor: Colors[scheme].background }]}>
         <Text style={{ color: Colors[scheme].text, fontSize: 16 }}>Preparing camera...</Text>
@@ -98,6 +163,7 @@ export default function ScanScreen() {
   }
 
   if (!permission.granted) {
+    devLog('UI: Permission not granted');
     return (
       <View style={[styles.centered, { backgroundColor: Colors[scheme].background, paddingHorizontal: 24 }]}>
         <FontAwesome name="camera" size={48} color={Colors[scheme].tint} style={{ marginBottom: 16 }} />
@@ -116,7 +182,10 @@ export default function ScanScreen() {
           Allow camera permissions to scan package QR codes.
         </Text>
         <Pressable
-          onPress={() => requestPermission()}
+          onPress={() => {
+            devLog('Grant permission button pressed');
+            requestPermission();
+          }}
           style={{
             backgroundColor: Colors[scheme].tint,
             paddingVertical: 12,
@@ -135,17 +204,22 @@ export default function ScanScreen() {
       <StatusBar barStyle="light-content" />
 
       <CameraView
+        key={cameraKey}
         style={StyleSheet.absoluteFillObject}
         facing={facing}
-        enableTorch={torchEnabled}
+        enableTorch={facing === 'front' ? false : torchEnabled}
         barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
-        active={isFocused && !sheetVisible && !mountError}
+        active={cameraActive}
         onBarcodeScanned={scanningActive ? handleBarcodeScanned : undefined}
         onCameraReady={() => {
+          devLog('onCameraReady fired', {
+            elapsedMs: activationStartRef.current ? Date.now() - activationStartRef.current : null,
+          });
           setCameraReady(true);
           setMountError(null);
         }}
         onMountError={(error: CameraMountError) => {
+          devLog('onMountError', error);
           setMountError(error?.message ?? 'Unable to start camera');
           setCameraReady(false);
         }}
@@ -226,6 +300,8 @@ export default function ScanScreen() {
             onPress={() => {
               setMountError(null);
               setCameraReady(false);
+              // Force a remount after error for a clean native restart
+              setCameraKey((k) => k + 1);
             }}
             style={{
               marginTop: 16,

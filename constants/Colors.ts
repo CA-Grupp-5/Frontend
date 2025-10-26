@@ -14,7 +14,17 @@ export const Palette = {
   white: 'hsl(0, 0%, 100%)',
   // whiteSoft : 'hsl(200, 90%, 50%)',
   whiteSoft : 'hsl(0, 0%, 90%)',
+  // testing new blacks
+  // black: 'hsl(0, 0%, 0%)',
   black: 'hsl(0, 0%, 0%)',
+  // black: 'hsl(221, 49%, 8%)',
+  // black: 'hsl(219, 30%, 15%)',
+  // black: 'hsl(222, 47%, 11%)',
+  // black: 'hsl(200, 2%, 2%)',
+  // black: 'hsl(180, 2%, 9%)',
+  // black: 'hsl(180, 2%, 13%)',
+  // black: 'hsl(195, 12%, 7%)',
+  
 
   // App-specific tint/brand color
   tint: tintColor,

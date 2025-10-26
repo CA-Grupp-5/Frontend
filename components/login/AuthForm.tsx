@@ -42,7 +42,7 @@ function AuthForm() {
   const rememberMe = watch('rememberMe');
 
   const inputBorderColor = 'rgba(74, 85, 104, 0.8)';
-  const placeholderTextColor = scheme === 'light' ? Colors.light.mutedText : 'rgba(160, 174, 192, 0.6)';
+  const placeholderTextColor = scheme === 'light' ? Colors.light.mutedText : '#cbd5e1';
   const inactiveCheckboxBorderColor = 'rgba(160, 174, 192, 0.5)';
   // Sign in button is ugly still, will keep for dev and use guest button as main in prod
   const primaryButtonTextColor = scheme === 'dark' ? '#000000' : '#111827';
