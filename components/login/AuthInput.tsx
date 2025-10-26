@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     fontSize: 16,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 16,
   },
   passwordToggle: {
     position: 'absolute',

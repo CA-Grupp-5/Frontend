@@ -57,9 +57,9 @@ function AuthButton({
 
 const styles = StyleSheet.create({
   button: {
-    paddingVertical: 16,
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
     shadowOffset: { width: 0, height: 4 },

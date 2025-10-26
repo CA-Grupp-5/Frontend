@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 24,
     borderWidth: StyleSheet.hairlineWidth,
   },
   content: { flex: 1 },
