@@ -13,7 +13,7 @@ export const Palette = {
   // Base
   white: 'hsl(0, 0%, 100%)',
   // whiteSoft : 'hsl(200, 90%, 50%)',
-  whiteSoft : 'hsl(0, 0%, 90%)',
+  whiteSoft : 'hsl(220, 13%, 91%)', //gray-200 
   // testing new blacks
   // black: 'hsl(0, 0%, 0%)',
   black: 'hsl(0, 0%, 0%)',
@@ -66,6 +66,7 @@ export const Palette = {
 interface ThemeColors  {
   text: string;
   background: string;
+  backgroundSoft?: string;
   tint: string;
   tabIconDefault: string;
   tabIconSelected: string;
@@ -82,6 +83,7 @@ const Colors: Record<ThemeName, ThemeColors>= {
   light: {
     text: Palette.gray900,
     background: Palette.white,
+    backgroundSoft: Palette.whiteSoft,
     tint: tintColor,
     tabIconDefault: Palette.gray400,
     tabIconSelected: tintColor,
@@ -96,6 +98,7 @@ const Colors: Record<ThemeName, ThemeColors>= {
   dark: {
     text: Palette.gray50,
     background: Palette.black,
+    backgroundSoft: Palette.darkTabBg,
     tint: tintColor,
     tabIconDefault: Palette.gray500,
     tabIconSelected: tintColor,

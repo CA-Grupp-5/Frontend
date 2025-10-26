@@ -27,7 +27,7 @@ export default function HomeScreen() {
 
   // try gray stone or zinc 200 after feedback round
   return (
-    <View style={[styles.screen, { backgroundColor: colors.background }]}>
+    <View style={[styles.screen, { backgroundColor: colors.backgroundSoft }]}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Dashboard</Text>
@@ -109,7 +109,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   header: { paddingHorizontal: 20, paddingTop: 40, paddingBottom: 12 },
-  headerTitle: { fontSize: 24, fontWeight: '800' },
+  headerTitle: { fontSize: 24, fontWeight: '800'},
   headerSubtitle: { fontSize: 12, marginTop: 4 },
   contentScroll: { paddingBottom: 96 },
   contentPad: { paddingHorizontal: 20 },

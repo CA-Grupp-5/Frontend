@@ -14,7 +14,7 @@ export default function MapStyleToggle({ label, tint, onPress }: Props) {
   const { colorScheme } = useColorScheme();
   const theme = colorScheme ?? 'light';
   const isDark = theme === 'dark';
-  const iconColor = isDark ? tint : ('hsl(220, 18%, 22%)' as any);
+  const iconColor = tint;
 
   return (
     <View style={{ position: 'absolute', right: 16, bottom: 16, zIndex: 10 }} pointerEvents="box-none">
@@ -30,7 +30,7 @@ export default function MapStyleToggle({ label, tint, onPress }: Props) {
           paddingHorizontal: 12,
           paddingVertical: 10,
           borderRadius: 22,
-          backgroundColor: isDark ? Palette.darkCardBg : Palette.lightCardBg,
+          backgroundColor: isDark ? Palette.darkCardBg : Palette.white,
           borderWidth: 1,
           borderColor: Colors[theme].tabBarBorder,
           gap: 8,
