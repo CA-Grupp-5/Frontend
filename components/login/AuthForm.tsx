@@ -12,13 +12,7 @@ import AuthInput from './AuthInput';
 import AuthButton from './AuthButton';
 import LoginOptionsRow from './LoginOptionsRow';
 import { useAlert } from '@/hooks/useAlert';
-
-type AuthFormValues = {
-  name: string;
-  email: string;
-  password: string;
-  rememberMe: boolean;
-};
+import { loginSchema, signupSchema, type AuthFormValues } from '@/lib/authValidation';
 
 export type AuthMode = 'login' | 'signup';
 
@@ -62,44 +56,57 @@ export default function AuthForm({ mode, onModeChange }: AuthFormProps) {
   const inactiveCheckboxBorderColor = 'rgba(160, 174, 192, 0.5)';
   const primaryButtonTextColor = scheme === 'dark' ? '#000000' : '#111827';
 
-  const onSubmit = handleSubmit(async ({ name, email, password, rememberMe }) => {
-    if (!password.trim()) {
-      await alert('Error', 'Please enter your password');
-      return;
-    }
+  const onSubmit = handleSubmit(
+    async (values) => {
+      const schema = isLogin ? loginSchema : signupSchema;
+      const validationResult = schema.safeParse(values);
 
-    if (!isLogin && !name.trim()) {
-      await alert('Error', 'Please enter your name');
-      return;
-    }
-
-    try {
-      if (isLogin) {
-        const success = await login(email, password, rememberMe);
-        if (!success) {
-          await alert('Error', 'Invalid password');
-          // Clear only the password field on invalid sign-in
-          setValue('password', '', { shouldDirty: false });
-          return;
-        }
-      } else {
-        const { register } = await import('@/lib/api');
-        await register(name.trim(), email, password);
-        await alert('Account created', 'You can now log in with your new credentials.');
-        onModeChange('login');
-        setValue('password', '', { shouldDirty: false });
-        setValue('name', '', { shouldDirty: false });
+      if (!validationResult.success) {
+        const [firstIssue] = validationResult.error.issues;
+        await alert('Error', firstIssue?.message ?? 'Please check your details and try again.');
+        return;
       }
-    } catch (error) {
-      console.log(error);
-      const message =
-        error instanceof Error && error.message
-          ? error.message
-          : 'Something went wrong. Please try again.';
-      await alert('Error', message);
-      return;
-    }
-  });
+
+      const { name, email, password, rememberMe } = validationResult.data;
+      const normalizedName = name ?? '';
+
+      try {
+        if (isLogin) {
+          const success = await login(email, password, rememberMe);
+          if (!success) {
+            await alert('Error', 'Invalid password');
+            // Clear only the password field on invalid sign-in
+            setValue('password', '', { shouldDirty: false });
+            return;
+          }
+        } else {
+          const { register } = await import('@/lib/api');
+          await register(normalizedName, email, password);
+          await alert('Account created', 'You can now log in with your new credentials.');
+          onModeChange('login');
+          setValue('password', '', { shouldDirty: false });
+          setValue('name', '', { shouldDirty: false });
+        }
+      } catch (error) {
+        console.log(error);
+        const message =
+          error instanceof Error && error.message
+            ? error.message
+            : 'Something went wrong. Please try again.';
+        await alert('Error', message);
+        return;
+      }
+    },
+    async (errors) => {
+      const firstError = Object.values(errors)[0];
+      if (firstError?.message) {
+        await alert('Error', firstError.message);
+        return;
+      }
+
+      await alert('Error', 'Please check your details and try again.');
+    },
+  );
 
   const handleGuestLogin = () => {
     loginGuest();
