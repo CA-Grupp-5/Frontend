@@ -1,10 +1,12 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, Modal, Pressable, Text, View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
-import Colors, { ThemeName } from '@/constants/Colors';
+import Colors, { Palette, ThemeName } from '@/constants/Colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import HistoryModal from './HistoryModal';
+import type { ApiPackage } from '@/lib/api';
+import { usePackagesStore } from '@/stores/packagesStore';
 type ViewMode = 'grid' | 'card' | 'list';
 type PackageItem = {
   id: string;
@@ -17,13 +19,26 @@ import CardItem from './packages/items/CardItem';
 import ListItem from './packages/items/ListItem';
 import ViewModeSelector from './packages/ViewModeSelector';
 
-const SAMPLE_PACKAGES: PackageItem[] = Array.from({ length: 50 }, (_, i) => {
-  const id = `PKG-${String(i + 1).padStart(4, '0')}`;
-  const status: PackageItem['status'] = (i % 3) !== 0 ? 'good' : 'alert';
-  const temperature = (18 + ((i * 7) % 8) + 0.3).toFixed(1);
-  const humidity = (45 + ((i * 11) % 20)).toFixed(0);
-  return { id, status, temperature, humidity };
-});
+function mapApiToItem(p: ApiPackage): PackageItem {
+  const temp = typeof p.current_temperature === 'number' ? p.current_temperature : null;
+  const hum = typeof p.current_humidity === 'number' ? p.current_humidity : null;
+
+  const tempOk = typeof temp === 'number'
+    ? temp >= p.expected_temperature_min && temp <= p.expected_temperature_max
+    : false; // fail-safe when missing
+  const humOk = typeof hum === 'number'
+    ? hum >= p.expected_humidity_min && hum <= p.expected_humidity_max
+    : false; // fail-safe when missing
+
+  const status: PackageItem['status'] = tempOk && humOk ? 'good' : 'alert';
+
+  return {
+    id: `PKG-${p.id}`,
+    status,
+    temperature: temp !== null ? temp.toFixed(1) : '--',
+    humidity: hum !== null ? String(Math.round(hum)) : '--',
+  };
+}
 
 export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { colorScheme } = useColorScheme();
@@ -33,6 +48,17 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
   const [mode, setMode] = useState<ViewMode>('grid');
   const [historyOpen, setHistoryOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const pkgRaw = usePackagesStore((s) => s.packages);
+  const loading = usePackagesStore((s) => s.loading);
+  const error = usePackagesStore((s) => s.error);
+  const fetchNow = usePackagesStore((s) => s.fetchNow);
+
+  // Refresh when modal opens for freshest view
+  useEffect(() => {
+    if (isOpen) fetchNow();
+  }, [isOpen, fetchNow]);
+
+  const items = useMemo<PackageItem[]>(() => pkgRaw.map(mapApiToItem), [pkgRaw]);
 
   const onHistory = useCallback((id: string) => {
     setSelectedId(id);
@@ -73,7 +99,7 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
             >
               <View>
                 <Text style={{ color: text, fontSize: 22, fontWeight: '800' }}>Packages</Text>
-                <Text style={{ color: Colors[scheme].mutedText }}>{SAMPLE_PACKAGES.length} packages in transit</Text>
+                <Text style={{ color: Colors[scheme].mutedText }}>{items.length} packages in transit</Text>
               </View>
               <Pressable
                 onPress={onClose}
@@ -89,10 +115,23 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
             {/* View Mode Selector */}
             <ViewModeSelector mode={mode} onChange={setMode} scheme={scheme} />
 
+            {/* Error state */}
+            {!!error && (
+              <View style={{ paddingHorizontal: 16, paddingVertical: 10 }}>
+                <View style={{ borderWidth: 1, borderColor: Palette.destructive, backgroundColor: scheme === 'dark' ? 'hsla(0, 84%, 60%, 0.1)' : 'hsla(0, 84%, 60%, 0.08)', borderRadius: 8, padding: 10, gap: 6 }}>
+                  <Text style={{ color: Colors[scheme].text, fontWeight: '700' }}>Failed to load packages</Text>
+                  <Text style={{ color: Colors[scheme].mutedText, fontSize: 12 }}>{String(error)}</Text>
+                  <Pressable onPress={fetchNow} accessibilityLabel="Retry loading packages" style={{ alignSelf: 'flex-start', paddingVertical: 6, paddingHorizontal: 10, borderWidth: 1, borderColor: Colors[scheme].tint, borderRadius: 8 }}>
+                    <Text style={{ color: Colors[scheme].text, fontWeight: '600' }}>Retry</Text>
+                  </Pressable>
+                </View>
+              </View>
+            )}
+
             {/* Content */}
             {mode === 'grid' && (
               <FlatList
-                data={SAMPLE_PACKAGES}
+                data={items}
                 key={'grid'}
                 numColumns={2}
                 contentContainerStyle={styles.gridContent}
@@ -102,12 +141,12 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
                 removeClippedSubviews
                 keyExtractor={(item) => item.id}
                 renderItem={renderGridItem}
-              />
+                />
             )}
 
             {mode === 'card' && (
               <FlatList
-                data={SAMPLE_PACKAGES}
+                data={items}
                 key={'card'}
                 contentContainerStyle={styles.listContent}
                 ItemSeparatorComponent={() => <View style={styles.cardSeparator} />}
@@ -121,7 +160,7 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
 
             {mode === 'list' && (
               <FlatList
-                data={SAMPLE_PACKAGES}
+                data={items}
                 key={'list'}
                 contentContainerStyle={styles.listNarrow}
                 initialNumToRender={20}
@@ -131,6 +170,12 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
                 keyExtractor={(item) => item.id}
                 renderItem={renderListItem}
               />
+            )}
+
+            {loading && items.length === 0 && (
+              <View style={{ padding: 16 }}>
+                <Text style={{ color: Colors[scheme].mutedText }}>Loading packages…</Text>
+              </View>
             )}
           </View>
         </SafeAreaView>

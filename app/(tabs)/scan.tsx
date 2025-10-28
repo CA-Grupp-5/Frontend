@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, StatusBar, StyleSheet, Text, View, Vibration } from 'react-native';
+import { ActivityIndicator, Pressable, StatusBar, StyleSheet, Text, View, Vibration } from 'react-native';
 import { CameraView, useCameraPermissions, type BarcodeScanningResult, type CameraMountError } from 'expo-camera';
 import { useColorScheme } from 'nativewind';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -10,8 +10,10 @@ import Colors, { Palette } from '@/constants/Colors';
 import ScanResultSheet, { type ScanResultPayload } from '@/components/ScanResultSheet';
 import { parseScannedPayload } from '@/lib/scan';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { useAlert } from '@/hooks/useAlert';
 
 export default function ScanScreen() {
+  const { alert } = useAlert();
   const { colorScheme } = useColorScheme();
   const scheme = colorScheme ?? 'dark';
   const [permission, requestPermission] = useCameraPermissions();
@@ -93,8 +95,8 @@ export default function ScanScreen() {
       lastScannedRef.current = null;
     }, 220);
     const packageLabel = payload?.packageId ? `Package ${payload.packageId}` : 'Package';
-    Alert.alert('Delivered', `${packageLabel} marked as delivered.`);
-  }, []);
+    alert('Delivered', `${packageLabel} marked as delivered.`);
+  }, [alert]);
 
   const scanningActive = useMemo(
     () => Boolean(permission?.granted && !sheetVisible && cameraReady && !mountError && isFocused),

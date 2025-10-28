@@ -5,10 +5,19 @@ interface AuthHeaderProps {
   textColor: string;
   subtextColor: string;
   borderColor: string;
+  title?: string;
+  subtitle?: string;
   style?: StyleProp<ViewStyle>;
 }
 
-function AuthHeader({ textColor, subtextColor, borderColor, style }: AuthHeaderProps) {
+function AuthHeader({
+  textColor,
+  subtextColor,
+  borderColor,
+  title = 'Welcome back',
+  subtitle = 'Sign in to your deliveries to continue',
+  style,
+}: AuthHeaderProps) {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.headerRow}>
@@ -24,10 +33,8 @@ function AuthHeader({ textColor, subtextColor, borderColor, style }: AuthHeaderP
         </View>
       </View>
 
-      <Text style={[styles.title, { color: textColor }]}>Welcome back</Text>
-      <Text style={[styles.subtitle, { color: subtextColor }]}>
-        Sign in to your deliveries to continue
-      </Text>
+      <Text style={[styles.title, { color: textColor }]}>{title}</Text>
+      <Text style={[styles.subtitle, { color: subtextColor }]}>{subtitle}</Text>
     </View>
   );
 }

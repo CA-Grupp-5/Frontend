@@ -1,9 +1,11 @@
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { useMemo, useState } from 'react';
 import DashboardCard from '@/components/DashboardCard';
 import DriverSheet, { type DriverInfo } from '@/components/DriverSheet';
 import PackagesModal from '@/components/PackagesModal';
 import { useDeliveryStore } from '@/stores/deliveryStore';
+import { usePackagesStore, isTempInRange, isHumInRange } from '@/stores/packagesStore';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRouter } from 'expo-router';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
@@ -11,7 +13,22 @@ export default function HomeScreen() {
   const { colors, palette } = useThemeColors();
   const [driverOpen, setDriverOpen] = useState(false);
   const [packagesOpen, setPackagesOpen] = useState(false);
-  const { eta, driver: driverInfo, packagesTotal, packageAlerts } = useDeliveryStore();
+  const { eta, driver: driverInfo } = useDeliveryStore();
+  const pkgs = usePackagesStore((s) => s.packages);
+  const lastUpdated = usePackagesStore((s) => s.lastUpdated);
+  const fetchNow = usePackagesStore((s) => s.fetchNow);
+  const packagesTotal = pkgs.length;
+  const packageAlerts = useMemo(() => pkgs.reduce((acc, p) => acc + ((isTempInRange(p) && isHumInRange(p)) ? 0 : 1), 0), [pkgs]);
+  const lastSyncedText = useMemo(() => {
+    if (!lastUpdated) return '--';
+    const delta = Date.now() - lastUpdated;
+    const secs = Math.floor(delta / 1000);
+    if (secs < 60) return `${secs}s ago`;
+    const mins = Math.floor(secs / 60);
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    return `${hrs}h ago`;
+  }, [lastUpdated]);
   const router = useRouter();
   const driver: DriverInfo = useMemo(
     () => ({
@@ -25,7 +42,6 @@ export default function HomeScreen() {
     [eta, driverInfo],
   );
 
-  // try gray stone or zinc 200 after feedback round
   return (
     <View style={[styles.screen, { backgroundColor: colors.backgroundSoft }]}>
       {/* Header */}
@@ -65,6 +81,33 @@ export default function HomeScreen() {
             title={`${packagesTotal} packages`}
             subtitle={`${packageAlerts} alerts`}
             subtitleColor={palette.destructive}
+            meta={{
+              iconName: 'clock-o',
+              iconColor: colors.mutedText,
+              text: lastSyncedText,
+              textColor: colors.text,
+              label: 'Last synced',
+              labelColor: colors.mutedText,
+            }}
+            extra={(
+              <Pressable
+                onPress={fetchNow}
+                hitSlop={10}
+                accessibilityLabel="Refresh packages"
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: StyleSheet.hairlineWidth,
+                  borderColor: colors.border,
+                  backgroundColor: colors.surface,
+                }}
+              >
+                <FontAwesome name="refresh" size={16} color={colors.text} />
+              </Pressable>
+            )}
           />
 
           {/* Scan */}

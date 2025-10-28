@@ -13,6 +13,8 @@ import { LogBox } from 'react-native';
 import '../global.css';
 import { useAuthStore } from '@/stores/authStore';
 import LoginScreen from '@/components/login/LoginScreen';
+import { usePackagesStore } from '@/stores/packagesStore';
+import { AlertProvider } from '@/components/alerts/AlertProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -65,12 +67,24 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const { colorScheme } = useColorScheme();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const startPolling = usePackagesStore((s) => s.startPolling);
+  const stopPolling = usePackagesStore((s) => s.stopPolling);
+
+  // Start background packages polling when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      startPolling();
+      return () => stopPolling();
+    }
+  }, [isAuthenticated, startPolling, stopPolling]);
 
   // Show login screen if not authenticated
   if (!isAuthenticated) {
     return (
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <LoginScreen />
+        <AlertProvider>
+          <LoginScreen />
+        </AlertProvider>
       </ThemeProvider>
     );
   }
@@ -78,10 +92,12 @@ function RootLayoutNav() {
   // Show protected app content if authenticated
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
+      <AlertProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        </Stack>
+      </AlertProvider>
     </ThemeProvider>
   );
 }
