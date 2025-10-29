@@ -1,5 +1,5 @@
 import type { LngLat } from './mapbox';
-// reusing mapbox coord types instead of redifining it
+// reusing mapbox coord types instead of redefining it
 
 export type Bounds = { ne: LngLat; sw: LngLat };
 

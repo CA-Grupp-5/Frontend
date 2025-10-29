@@ -1,146 +1,133 @@
-## Delivra Mobile App (Expo + RN)
+## Delivra Mobile App (React Native Bare + Expo Router)
 
-Modern React Native app using Expo Router, NativeWind (Tailwind for RN), Zustand + MMKV, and Mapbox.
-
-
+Bare React Native app with Expo modules and file-based routing. Uses TypeScript, Zustand + MMKV for state, Mapbox for maps/directions, and Expo Camera for QR scanning.
 
 ### Stack
 
-- Expo SDK 53, React Native 0.79
-- TypeScript, Expo Router (file‑based routing)
-- Inline styles, stylesheet and NativeWind 4 (Tailwind)
-- State: Zustand, storage: MMKV
-- Map: `@rnmapbox/maps` 
-- Tooling: ESLint, Prettier, Jest
+- React Native 0.79, Expo SDK 53, Expo Router
+- TypeScript, NativeWind color scheme
+- State: Zustand with MMKV persistence
+- Maps: `@rnmapbox/maps` (+ Mapbox Directions API)
+- Tests/Tooling: Jest, ESLint, Prettier
 
 ### Requirements
 
-- Node 22+ (LTS recommended)
-- Bun (recommended): https://bun.sh
-- Java 17 in PATH for native Android builds
+- Node 22+
+- Bun (preferred): https://bun.sh
+- Android: Java 17 in PATH, Android Studio/SDK
+- iOS (macOS): Xcode + CocoaPods
 
-### Quick Start
+### Setup
 
-1) Install deps (Bun recommended):
+1) Install dependencies
 
-```ps
+```powershell
 bun install
 ```
 
-2) Configure environment (create `.env`):
+2) Configure environment (create `.env`)
 
 ```env
-# Required for maps/geocoding/directions
+# Mapbox runtime token (public, pk.*)
 MAPBOX_ACCESS_TOKEN=pk.your_token_here
 
-# Mapbox downloads token for Android Maven (secret; starts with sk.)
+# Mapbox downloads token for Gradle (secret, sk.*) – required for Android builds
 MAPBOX_DOWNLOADS_TOKEN=sk.your_token_here
-(see env.example)
 
--ADD THOSE TO GITHUB ACTION SECRETS AS WELL!
+# Backend base URL (must be HTTPS). Also exposed via app.config.ts → expo.extra
+POSTGRES_URL=https://your-api-host
+```
 
+- Add allowed signup domains in `allowedDomains.json`.
+- `app.config.ts` reads env vars and exposes them under `expo.extra`.
 
-3) Start the app (Dev Client, LAN host):
+### Run (Dev Client)
 
-```ps
-bun run start
-# or, if bundler picks 127.0.0.1, use the LAN-aware starter
+Start Metro with a LAN host (good for real devices):
+
+```powershell
+bun run s
+# or use the LAN-aware starter script
 bun run sc
 ```
 
-Open on device with the Expo Dev Client, or run a native target (below).
+Open on device with the Expo Dev Client, or run native targets below.
 
-### Android / iOS
+### Android / iOS (bare)
 
-- Android (run on a device/emulator):
+Android:
 
-```bash
+```powershell
 bun run android
-# or prebuild native projects then run
+# Prebuild native projects then run
 bun run android:prebuild
 ```
 
-- iOS (on macOS):
+iOS (macOS):
 
-```bash
+```powershell
 bun run ios
-# or prebuild then run
+# Prebuild then run
 bun run ios:prebuild
 ```
 
-Ensure Java 17 is installed for Android builds. The Gradle wrapper is used automatically.
+Ensure Java 17 is installed for Android. The Gradle wrapper is used automatically.
 
 ### Dev Build Shortcuts (APK)
 
-Convenience PowerShell scripts live in `./scripts` and are exposed via package scripts.
+PowerShell scripts in `./scripts` create APKs. Exposed via package scripts:
 
-- Debug/dev APK (includes expo-dev-client):
-
-```powershell
-bun dev
-```
-
-- Release APK (Gradle release):
+- Debug/dev APK (includes expo-dev-client)
 
 ```powershell
-bun release
+bun run dev
 ```
 
-These scripts will:
-- Verify Java 17
-- Ensure `expo-dev-client` is present (debug script)
-- Run `bun install` when Bun is available
-- Use the Gradle wrapper to assemble APKs
+- Release APK (Gradle release)
 
-If PowerShell execution is blocked, bypass policy for a single run:
+```powershell
+bun run release
+```
+
+If PowerShell execution is blocked:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-android-debug.ps1
 ```
 
-
 ### Scripts
 
-- Start dev server (Dev Client + LAN): `bun s`
-- Start dev server with cleared cache (Dev Client + LAN): `bun sclear`
-- Tests (watch): `bun t`
-- Lint: `bun lint`
-- Format: `bun format`
-
-
-### Package manager
-
- Bun is preferred. The repo includes a `bun.lock` and scripts use Bun.
-
-### Features in App
-
-- Auth  with Zustand + MMKV 
-- Theming with light/dark toggle
-- Tabs: Home, Map (Mapbox),Scan, Settings
-- Map: driver marker, geocoded home address, route line + ETA, style toggle
-- Packages modal with grid/card/list views and a history modal
+- Start dev server (Dev Client + LAN): `bun run s`
+- Start with clear cache: `bun run sclear`
+- Start with LAN auto-detect script: `bun run sc`
+- Tests (watch): `bun run t`
+- Lint: `bun run lint`
+- Format: `bun run format`
 
 ### Project Structure
 
-- `app/` Expo Router routes (`(tabs)`, `modal`, etc.)
-- `components/` UI components (LoginScreen, DriverSheet, PackagesModal)
-- `stores/` Zustand stores (e.g., `authStore`)
-- `lib/` Utilities (Mapbox helpers, MMKV, misc)
-- `constants/` Theme colors
-- `global.css` Tailwind entry used by `metro.config.js`
+- `app/` Routes via Expo Router (`(tabs)`, `modal`, etc.)
+- `components/` Reusable UI (Login, Driver/Scan sheets, Packages)
+- `stores/` Zustand stores (auth, delivery, packages, settings)
+- `lib/` API and utilities (mapbox helpers, scan parsing)
+- `constants/` Theme palette and mapping
+- `android/`, `ios/` – Native projects (bare workflow)
 
+For a deeper walkthrough, see `docs/architecture.md`.
 
+### API
+
+Endpoints and client expectations live in `docs/api.md`.
 
 ### Notes / Roadmap
 
-Planned next steps (see `NOTESnTODOS.md`):
-- Add filters/search in Packages view when real data is available
-- Rebuild history charts
-- Settings enhancements, QR scanning, push notifications
+See `NOTESnTODOS.md` for short-term items.
 
 ### Troubleshooting
 
-- Windows PowerShell execution policy may block the build scripts. Run with `-ExecutionPolicy Bypass` as shown above.
-- If the Expo packager binds to `127.0.0.1`, use `bun run sc` to pick your LAN IPv4 automatically.
-- Ensure `MAPBOX_ACCESS_TOKEN` is set; without it Mapbox maps/geocoding will not work.
+- If Metro binds to `127.0.0.1`, use `bun run sc` to force a LAN IPv4.
+- Map not rendering or no route: verify `MAPBOX_ACCESS_TOKEN`.
+- Android build fails fetching Mapbox: ensure `MAPBOX_DOWNLOADS_TOKEN` is set.
+- Camera/scan not working: grant camera permission on the device/emulator.
+- Windows: if scripts are blocked, run with `-ExecutionPolicy Bypass` as shown above.
 
