@@ -9,8 +9,11 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import Colors, { Palette } from '@/constants/Colors';
 import ScanResultSheet, { type ScanResultPayload } from '@/components/ScanResultSheet';
 import { parseScannedPayload } from '@/lib/scan';
+import { formatPackageId } from '@/lib/utils';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAlert } from '@/hooks/useAlert';
+
+// formatPackageId moved to lib/utils
 
 export default function ScanScreen() {
   const { alert } = useAlert();
@@ -94,7 +97,8 @@ export default function ScanScreen() {
       setResult(null);
       lastScannedRef.current = null;
     }, 220);
-    const packageLabel = payload?.packageId ? `Package ${payload.packageId}` : 'Package';
+    const formattedId = formatPackageId(payload?.packageId);
+    const packageLabel = formattedId ? `Package ${formattedId}` : 'Package';
     alert('Delivered', `${packageLabel} marked as delivered.`);
   }, [alert]);
 

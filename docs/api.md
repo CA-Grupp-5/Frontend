@@ -65,7 +65,35 @@ Validation:
 
 ### GET /packages
 
-Response: array of package objects. The client accepts response under the root array, or under common keys like `data`, `packages`, `items`, `rows`, `result`.
+Response: envelope with a message and a list of packages.
+
+```json
+{
+  "message": "Packages retrieved successfully",
+  "packages": [
+    {
+      "id": 101,
+      "sender_id": 1,
+      "receiver_id": 55,
+      "current_location": "Hub A",
+      "status": "IN_TRANSIT",
+      "assigned_truck_id": 7,
+      "expected_temperature_min": 18,
+      "expected_temperature_max": 24,
+      "expected_humidity_min": 45,
+      "expected_humidity_max": 60,
+      "created_at": "2024-10-01T12:00:00Z",
+      "updated_at": null,
+      "current_temperature": 22.1,
+      "current_humidity": 53,
+      "last_sensor_at": "2025-10-29T12:49:29.528Z",
+      "sender_name": "Sender Co",
+      "receiver_name": "Receiver LLC",
+      "driver_position": null
+    }
+  ]
+}
+```
 
 Package shape used by the client (`ApiPackage`):
 
@@ -90,11 +118,10 @@ type ApiPackage = {
 }
 ```
 
-Normalization rules in the client:
+Client parsing:
 
-- Numeric fields may arrive as strings; the client coerces them to numbers.
-- Unknown/extra fields are ignored.
-- Results without a numeric `id` are filtered out.
+- The client expects the exact envelope `{ message: string, packages: ApiPackage[] }`.
+- Numeric string fields are coerced to numbers via runtime validation.
 
 Example response (minimal):
 
@@ -121,4 +148,3 @@ Example response (minimal):
   }
 ]
 ```
-

@@ -5,7 +5,7 @@ export type LoginResponse = {
   [key: string]: any;
 };
 
-// Packages API DTO (snake_case as returned by backend)NEED BACKEND TO ADD TEMP DIRECTLY IN /PACKAGES
+
 export type ApiPackage = {
   id: number;
   sender_id: number;
@@ -21,9 +21,10 @@ export type ApiPackage = {
   updated_at: string | null;
   sender_name: string;
   receiver_name: string;
-  // NEED THESE TWO TO BE ADDED DIRECTLY IN /PACKAGES
   current_temperature?: number | null;
   current_humidity?: number | null;
+  last_sensor_at?: string | null;
+  driver_position?: unknown | null;
 };
 
 function ensureHttps(u: string): string {
@@ -53,6 +54,30 @@ function readBaseUrl(): string {
 function buildUrl(base: string, path: string): string {
   return new URL(path, ensureHttps(base)).toString();
 }
+
+// Runtime schema for server responses
+const ApiPackageSchema = z
+  .object({
+    id: z.coerce.number(),
+    sender_id: z.coerce.number(),
+    receiver_id: z.coerce.number(),
+    current_location: z.string().nullable(),
+    status: z.string(),
+    assigned_truck_id: z.coerce.number().nullable(),
+    expected_temperature_min: z.coerce.number(),
+    expected_temperature_max: z.coerce.number(),
+    expected_humidity_min: z.coerce.number(),
+    expected_humidity_max: z.coerce.number(),
+    created_at: z.string(),
+    updated_at: z.string().nullable(),
+    sender_name: z.string(),
+    receiver_name: z.string(),
+    current_temperature: z.coerce.number().nullable().optional(),
+    current_humidity: z.coerce.number().nullable().optional(),
+    last_sensor_at: z.string().nullable().optional(),
+    driver_position: z.any().nullable().optional(),
+  })
+  .passthrough();
 
 export async function login(email: string, password: string): Promise<LoginResponse> {
   const baseUrlRaw = readBaseUrl();
@@ -119,47 +144,46 @@ export async function fetchPackages(): Promise<ApiPackage[]> {
     throw new Error(`Fetch packages failed: ${res.status} ${text}`);
   }
 
-  const json: any = await res.json().catch(() => ({}));
+  const ResponseSchema = z
+    .object({
+      message: z.string(),
+      packages: z.array(ApiPackageSchema),
+    })
+    .passthrough();
 
-  let arr: any = json;
-  if (!Array.isArray(arr)) {
-    const candidates = ['data', 'packages', 'items', 'rows', 'result'];
-    for (const key of candidates) {
-      const maybe = json?.[key];
-      if (Array.isArray(maybe)) {
-        arr = maybe;
-        break;
-      }
-    }
+  const parsed = ResponseSchema.safeParse(await res.json());
+  if (!parsed.success) {
+    throw new Error('Unexpected /packages response shape');
   }
-
-  if (!Array.isArray(arr)) {
-    // Surface a meaningful error for UI and dev logs
-    const shape = json && typeof json === 'object' ? Object.keys(json).join(',') : typeof json;
-    console.log('Unexpected /packages response shape. Keys:', shape);
-    throw new Error('Unexpected packages response shape');
-  }
-
-  // Normalize numeric fields if backend provides strings
-  const toNum = (v: any) => (typeof v === 'string' ? Number(v) : v);
-  const normalized: ApiPackage[] = arr.map((p: any) => ({
-    id: toNum(p?.id),
-    sender_id: toNum(p?.sender_id),
-    receiver_id: toNum(p?.receiver_id),
-    current_location: p?.current_location ?? null,
-    status: String(p?.status ?? ''),
-    assigned_truck_id: p?.assigned_truck_id == null ? null : toNum(p?.assigned_truck_id),
-    expected_temperature_min: toNum(p?.expected_temperature_min),
-    expected_temperature_max: toNum(p?.expected_temperature_max),
-    expected_humidity_min: toNum(p?.expected_humidity_min),
-    expected_humidity_max: toNum(p?.expected_humidity_max),
-    created_at: String(p?.created_at ?? ''),
-    updated_at: p?.updated_at == null ? null : String(p?.updated_at),
-    sender_name: String(p?.sender_name ?? ''),
-    receiver_name: String(p?.receiver_name ?? ''),
-    current_temperature: p?.current_temperature == null ? null : toNum(p?.current_temperature),
-    current_humidity: p?.current_humidity == null ? null : toNum(p?.current_humidity),
-  }));
-
-  return normalized.filter((p) => Number.isFinite(p.id));
+  return parsed.data.packages as ApiPackage[];
 }
+
+export async function fetchPackageById(id: number | string): Promise<ApiPackage> {
+  const baseUrlRaw = readBaseUrl();
+  if (!baseUrlRaw) throw new Error('POSTGRES_URL is not configured for the mobile client');
+  const endpoint = buildUrl(baseUrlRaw, `/packages/${id}`);
+
+  const res = await fetch(endpoint, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Fetch package ${id} failed: ${res.status} ${text}`);
+  }
+
+  const ResponseSchema = z
+    .object({
+      message: z.string(),
+      package: ApiPackageSchema,
+    })
+    .passthrough();
+
+  const parsed = ResponseSchema.safeParse(await res.json());
+  if (!parsed.success) {
+    throw new Error(`Unexpected /packages/${id} response shape`);
+  }
+  return parsed.data.package as ApiPackage;
+}
+import { z } from 'zod';

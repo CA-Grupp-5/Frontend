@@ -1,19 +1,17 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Dimensions, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+
 import Colors, { Palette } from '@/constants/Colors';
+import { formatPackageId } from '@/lib/utils';
 import { useColorScheme } from 'nativewind';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export type ScanResultPayload = {
   packageId?: string;
-  recipient?: string;
-  address?: string;
-  notes?: string;
-  temperatureC?: number;
-  humidity?: number;
+  senderName?: string;
   raw: string;
 };
 
@@ -43,30 +41,10 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
 
   const text = Colors[scheme].text;
   const tint = Colors[scheme].tint;
-  const cardBg = useMemo(() => Colors[scheme].surface, [scheme]);
   const muted = Colors[scheme].mutedText;
 
-  const vitals = useMemo(() => {
-    const items: { label: string; value: string; icon: React.ComponentProps<typeof FontAwesome>['name'] }[] = [];
-    if (!payload) return items;
-    if (typeof payload.temperatureC === 'number' && Number.isFinite(payload.temperatureC)) {
-      items.push({
-        label: 'Temperature',
-        value: `${payload.temperatureC.toFixed(1)}°C`,
-        icon: 'thermometer-half',
-      });
-    }
-    if (typeof payload.humidity === 'number' && Number.isFinite(payload.humidity)) {
-      items.push({
-        label: 'Humidity',
-        value: `${payload.humidity.toFixed(0)}%`,
-        icon: 'tint',
-      });
-    }
-    return items;
-  }, [payload]);
-
   if (!display || !payload) return null;
+  const displayId = formatPackageId(payload.packageId);
 
   return (
     <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 40 }}>
@@ -97,7 +75,7 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
             <View style={{ width: 48, height: 4, borderRadius: 2, backgroundColor: Colors[scheme].divider }} />
           </View>
 
-          <View style={{ gap: 12 }}>
+          <View style={{ gap: 16 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
               <View
                 style={{
@@ -113,99 +91,15 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={{ color: text, fontSize: 20, fontWeight: '800' }}>
-                  {payload.packageId ?? 'Package detected'}
+                  {displayId ?? 'Package detected'}
                 </Text>
-                {payload.recipient ? (
+                {payload.senderName ? (
                   <Text style={{ color: muted, fontSize: 14 }}>
-                    Recipient: {payload.recipient}
+                    Sender: {payload.senderName}
                   </Text>
                 ) : null}
               </View>
             </View>
-
-            {payload.address ? (
-              <View
-                style={{
-                  backgroundColor: cardBg,
-                  borderRadius: 16,
-                  padding: 16,
-                  gap: 6,
-                  borderWidth: 1,
-                  borderColor: Colors[scheme].border,
-                }}
-              >
-                <Text style={{ color: muted, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>
-                  Delivery Address
-                </Text>
-                <Text style={{ color: text, fontSize: 16, fontWeight: '600' }}>{payload.address}</Text>
-              </View>
-            ) : null}
-
-            {vitals.length ? (
-              <View
-                style={{
-                  backgroundColor: cardBg,
-                  borderRadius: 16,
-                  padding: 16,
-                  borderWidth: 1,
-                  borderColor: Colors[scheme].border,
-                  gap: 12,
-                }}
-              >
-                <Text style={{ color: muted, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Package Vitals</Text>
-                <View style={{ flexDirection: 'row', gap: 12 }}>
-                  {vitals.map((item) => (
-                    <View
-                      key={item.label}
-                      style={{
-                        flex: 1,
-                        backgroundColor: scheme === 'dark' ? Palette.darkCardBg : Palette.white,
-                        borderRadius: 14,
-                        paddingVertical: 12,
-                        paddingHorizontal: 14,
-                        borderWidth: 1,
-                        borderColor: Colors[scheme].border,
-                        alignItems: 'center',
-                        gap: 6,
-                      }}
-                    >
-                      <View
-                        style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: 10,
-                          backgroundColor: tint,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        <FontAwesome name={item.icon} size={18} color={Palette.white} />
-                      </View>
-                      <Text style={{ color: muted, fontSize: 12 }}>{item.label}</Text>
-                      <Text style={{ color: text, fontWeight: '700', fontSize: 16 }}>{item.value}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            ) : null}
-
-            {payload.notes ? (
-              <View
-                style={{
-                  backgroundColor: cardBg,
-                  borderRadius: 16,
-                  padding: 16,
-                  gap: 6,
-                  borderWidth: 1,
-                  borderColor: Colors[scheme].border,
-                }}
-              >
-                <Text style={{ color: muted, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>
-                  Notes
-                </Text>
-                <Text style={{ color: text, fontSize: 15 }}>{payload.notes}</Text>
-              </View>
-            ) : null}
 
             <View style={{ gap: 12 }}>
               <Pressable
@@ -243,8 +137,6 @@ export default function ScanResultSheet({ visible, payload, onClose, onMarkDeliv
                 <Text style={{ color: text, fontWeight: '600' }}>Scan again</Text>
               </Pressable>
             </View>
-
-            {null}
           </View>
         </SafeAreaView>
       </Animated.View>

@@ -7,6 +7,18 @@ type CameraProps = {
   onBarcodeScanned?: (e: { data: string }) => void;
 };
 let mockCameraProps: CameraProps = {};
+const mockAlert = jest.fn();
+const mockShowAlert = jest.fn().mockResolvedValue(undefined);
+const mockHideAlert = jest.fn();
+
+jest.mock('@/hooks/useAlert', () => ({
+  useAlert: () => ({
+    alert: mockAlert,
+    showAlert: mockShowAlert,
+    hide: mockHideAlert,
+  }),
+}));
+
 jest.mock('expo-camera', () => ({
   CameraView: (props: CameraProps) => {
     mockCameraProps = props;
@@ -34,6 +46,10 @@ jest.mock('@/components/ScanResultSheet', () => ({
 jest.mock('@expo/vector-icons/FontAwesome', () => () => null);
 
 describe('ScanScreen', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders the scan header when permission is granted', async () => {
     const { getByText } = render(<ScanScreen />);
     expect(getByText('Scan package QR')).toBeTruthy();
