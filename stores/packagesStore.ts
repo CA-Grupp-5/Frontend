@@ -38,7 +38,8 @@ export const usePackagesStore = create<PackagesState>()(
         set({ loading: true, error: null });
         try {
           const data = await fetchPackages();
-          set({ packages: data, lastUpdated: Date.now(), loading: false, error: null });
+          const filtered = data.filter((p) => String(p.status).toLowerCase() !== 'delivered');
+          set({ packages: filtered, lastUpdated: Date.now(), loading: false, error: null });
         } catch (e: any) {
           const msg = typeof e?.message === 'string' ? e.message : 'Failed to fetch packages';
           set({ loading: false, error: msg });
@@ -79,4 +80,3 @@ export const isHumInRange = (p: ApiPackage): boolean => {
   const h = typeof p.current_humidity === 'number' ? p.current_humidity : NaN;
   return Number.isFinite(h) && h >= p.expected_humidity_min && h <= p.expected_humidity_max;
 };
-

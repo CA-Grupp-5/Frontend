@@ -12,8 +12,9 @@ import { parseScannedPayload } from '@/lib/scan';
 import { formatPackageId } from '@/lib/utils';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useAlert } from '@/hooks/useAlert';
+import { fetchPackageById, updatePackage } from '@/lib/api';
+import { usePackagesStore } from '@/stores/packagesStore';
 
-// formatPackageId moved to lib/utils
 
 export default function ScanScreen() {
   const { alert } = useAlert();
@@ -30,21 +31,9 @@ export default function ScanScreen() {
   const [mountError, setMountError] = useState<string | null>(null);
   const [torchEnabled, setTorchEnabled] = useState<boolean>(false);
   const [facing, setFacing] = useState<'front' | 'back'>('back');
-  const activationStartRef = useRef<number | null>(null);
-  const [cameraKey, setCameraKey] = useState(0);
-  const [retryCount, setRetryCount] = useState(0);
-
-  const devLog = (...args: any[]) => {
-    // eslint-disable-next-line 
-    if (__DEV__) {
-      // Prefix logs for easier filtering in native logs
-      console.log('[ScanCamera]', ...args);
-    }
-  };
 
   useEffect(() => {
     if (!permission) {
-      devLog('Requesting camera permission (initial)');
       requestPermission().catch(() => {});
     }
   }, [permission, requestPermission]);
@@ -91,15 +80,30 @@ export default function ScanScreen() {
     }, 220);
   }, []);
 
-  const handleMarkDelivered = useCallback((payload: ScanResultPayload | null) => {
+  const handleMarkDelivered = useCallback(async (payload: ScanResultPayload | null) => {
     setSheetVisible(false);
     setTimeout(() => {
       setResult(null);
       lastScannedRef.current = null;
     }, 220);
-    const formattedId = formatPackageId(payload?.packageId);
-    const packageLabel = formattedId ? `Package ${formattedId}` : 'Package';
-    alert('Delivered', `${packageLabel} marked as delivered.`);
+
+    try {
+      const raw = payload?.packageId ? String(payload.packageId) : '';
+      const id = raw.replace(/^PKG-/i, '');
+      if (!id) throw new Error('Missing package id');
+
+      const pkg = await fetchPackageById(id);
+      const updated = await updatePackage({ ...pkg, status: 'delivered' });
+
+      const formattedId = formatPackageId(String(updated.id));
+      const packageLabel = formattedId ? `Package ${formattedId}` : 'Package';
+      alert('Delivered', `${packageLabel} marked as delivered.`);
+      try { usePackagesStore.getState().fetchNow(); } catch { /* ignore refresh errors */ }
+    } catch {
+      const formattedId = formatPackageId(payload?.packageId);
+      const packageLabel = formattedId ? `Package ${formattedId}` : 'Package';
+      alert('Failed', `Could not mark ${packageLabel} as delivered.`);
+    }
   }, [alert]);
 
   const scanningActive = useMemo(
@@ -112,55 +116,8 @@ export default function ScanScreen() {
     [isFocused, permission?.granted, mountError],
   );
 
-  // State change logs 
-  useEffect(() => { devLog('isFocused ->', isFocused); }, [isFocused]);
-  useEffect(() => { devLog('permission.granted ->', permission?.granted); }, [permission?.granted]);
-  useEffect(() => { devLog('sheetVisible ->', sheetVisible); }, [sheetVisible]);
-  useEffect(() => { devLog('mountError ->', mountError); }, [mountError]);
-  useEffect(() => { devLog('cameraReady ->', cameraReady); }, [cameraReady]);
-  useEffect(() => { devLog('facing ->', facing); }, [facing]);
-  useEffect(() => { devLog('torchEnabled ->', torchEnabled); }, [torchEnabled]);
-  useEffect(() => {
-    devLog('cameraActive ->', cameraActive);
-    if (cameraActive) {
-      activationStartRef.current = Date.now();
-    } else {
-      activationStartRef.current = null;
-    }
-  }, [cameraActive]);
-
-  useEffect(() => { devLog('scanningActive ->', scanningActive); }, [scanningActive]);
-  useEffect(() => { devLog('cameraKey ->', cameraKey); }, [cameraKey]);
-  useEffect(() => { devLog('retryCount ->', retryCount); }, [retryCount]);
-
-  // Watchdog: if active but not ready within 4s, log a snapshot and auto-remount in dev
-  useEffect(() => {
-    if (!cameraActive || cameraReady) return;
-    const t = setTimeout(() => {
-      if (!cameraReady && cameraActive) {
-        devLog('Watchdog: camera not ready after 4000ms', {
-          isFocused,
-          granted: permission?.granted,
-          sheetVisible,
-          mountError,
-          facing,
-          torchEnabled,
-        });
-        // eslint-disable-next-line
-        if (__DEV__ && retryCount < 2) {
-          devLog('Watchdog: auto-remounting camera (dev)', { retryCount });
-          setRetryCount((c) => c + 1);
-          setCameraReady(false);
-          setMountError(null);
-          setCameraKey((k) => k + 1);
-        }
-      }
-    }, 4000);
-    return () => clearTimeout(t);
-  }, [cameraActive, cameraReady, isFocused, permission?.granted, sheetVisible, mountError, facing, torchEnabled, retryCount]);
 
   if (!permission) {
-    devLog('UI: Preparing camera (permission unresolved)');
     return (
       <View style={[styles.centered, { backgroundColor: Colors[scheme].background }]}>
         <Text style={{ color: Colors[scheme].text, fontSize: 16 }}>Preparing camera...</Text>
@@ -169,7 +126,6 @@ export default function ScanScreen() {
   }
 
   if (!permission.granted) {
-    devLog('UI: Permission not granted');
     return (
       <View style={[styles.centered, { backgroundColor: Colors[scheme].background, paddingHorizontal: 24 }]}>
         <FontAwesome name="camera" size={48} color={Colors[scheme].tint} style={{ marginBottom: 16 }} />
@@ -189,7 +145,6 @@ export default function ScanScreen() {
         </Text>
         <Pressable
           onPress={() => {
-            devLog('Grant permission button pressed');
             requestPermission();
           }}
           style={{
@@ -210,7 +165,6 @@ export default function ScanScreen() {
       <StatusBar barStyle="light-content" />
 
       <CameraView
-        key={cameraKey}
         style={StyleSheet.absoluteFillObject}
         facing={facing}
         enableTorch={facing === 'front' ? false : torchEnabled}
@@ -218,14 +172,10 @@ export default function ScanScreen() {
         active={cameraActive}
         onBarcodeScanned={scanningActive ? handleBarcodeScanned : undefined}
         onCameraReady={() => {
-          devLog('onCameraReady fired', {
-            elapsedMs: activationStartRef.current ? Date.now() - activationStartRef.current : null,
-          });
           setCameraReady(true);
           setMountError(null);
         }}
         onMountError={(error: CameraMountError) => {
-          devLog('onMountError', error);
           setMountError(error?.message ?? 'Unable to start camera');
           setCameraReady(false);
         }}
@@ -302,23 +252,6 @@ export default function ScanScreen() {
             Camera unavailable
           </Text>
           <Text style={{ color: Palette.gray300, marginTop: 6, textAlign: 'center' }}>{mountError}</Text>
-          <Pressable
-            onPress={() => {
-              setMountError(null);
-              setCameraReady(false);
-              // Force a remount after error for a clean native restart
-              setCameraKey((k) => k + 1);
-            }}
-            style={{
-              marginTop: 16,
-              paddingHorizontal: 20,
-              paddingVertical: 10,
-              borderRadius: 999,
-              backgroundColor: Colors[scheme].tint,
-            }}
-          >
-            <Text style={{ color: 'hsl(210, 20%, 12%)', fontWeight: '600' }}>Try again</Text>
-          </Pressable>
         </View>
       ) : null}
 

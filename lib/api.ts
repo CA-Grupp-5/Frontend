@@ -1,3 +1,4 @@
+import { z } from 'zod';
 
 export type LoginResponse = {
   token?: string;
@@ -186,4 +187,45 @@ export async function fetchPackageById(id: number | string): Promise<ApiPackage>
   }
   return parsed.data.package as ApiPackage;
 }
-import { z } from 'zod';
+export async function updatePackage(pkg: ApiPackage): Promise<ApiPackage> {
+  const baseUrlRaw = readBaseUrl();
+  if (!baseUrlRaw) throw new Error('POSTGRES_URL is not configured for the mobile client');
+  const endpoint = buildUrl(baseUrlRaw, `/packages/${pkg.id}`);
+
+  const res = await fetch(endpoint, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(pkg),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Update package ${pkg.id} failed: ${res.status} ${text}`);
+  }
+
+  // if the expected shape isn't present, fall back to refetching the package.
+  const rawJson = await res.json().catch(() => ({} as any));
+
+  const ResponseSchema = z
+    .object({
+      message: z.string().optional(),
+      package: ApiPackageSchema.optional(),
+    })
+    .passthrough();
+
+  const parsed = ResponseSchema.safeParse(rawJson);
+  if (parsed.success && parsed.data.package) {
+    return parsed.data.package as ApiPackage;
+  }
+
+  
+  try {
+    const fresh = await fetchPackageById(pkg.id);
+    return fresh;
+  } catch (e) {
+    // If refetch also fails, surface a helpful error.
+    throw new Error(
+      `Update succeeded but failed to refetch package ${pkg.id}: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
+}

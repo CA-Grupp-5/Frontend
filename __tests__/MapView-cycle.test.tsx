@@ -4,7 +4,6 @@ import { render, fireEvent } from '@testing-library/react-native';
 //#region mocks and helpers
 // Mocks
 
-// Mapbox to inert components + minimal StyleURL
 jest.mock('@rnmapbox/maps', () => {
   const Null = () => null;
   const mock = {
@@ -18,7 +17,6 @@ jest.mock('@rnmapbox/maps', () => {
   return { __esModule: true, default: mock, ...mock };
 });
 
-// Icons + theme
 jest.mock('@expo/vector-icons/FontAwesome', () => () => null);
 jest.mock('nativewind', () => ({ useColorScheme: () => ({ colorScheme: 'light' }) }));
 
