@@ -1,6 +1,9 @@
-## Delivra Mobile App (React Native Bare + Expo Router)
+## Delivra Mobile App quick start and overview(React Native Bare + Expo Router)
+For other in depth docs check the docs folder
 
 Bare React Native app with Expo modules and file-based routing. Uses TypeScript, Zustand + MMKV for state, Mapbox for maps/directions, and Expo Camera for QR scanning.
+
+
 
 ### Stack
 
