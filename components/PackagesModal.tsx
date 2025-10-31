@@ -18,6 +18,8 @@ import GridItem from './packages/items/GridItem';
 import CardItem from './packages/items/CardItem';
 import ListItem from './packages/items/ListItem';
 import ViewModeSelector from './packages/ViewModeSelector';
+import SearchBar from './packages/SearchBar';
+import FilterBar, { type StatusFilter } from './packages/FilterBar';
 
 function mapApiToItem(p: ApiPackage): PackageItem {
   const temp = typeof p.current_temperature === 'number' ? p.current_temperature : null;
@@ -48,6 +50,8 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
   const [mode, setMode] = useState<ViewMode>('grid');
   const [historyOpen, setHistoryOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const pkgRaw = usePackagesStore((s) => s.packages);
   const loading = usePackagesStore((s) => s.loading);
   const error = usePackagesStore((s) => s.error);
@@ -59,6 +63,15 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
   }, [isOpen, fetchNow]);
 
   const items = useMemo<PackageItem[]>(() => pkgRaw.map(mapApiToItem), [pkgRaw]);
+  const visibleItems = useMemo<PackageItem[]>(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return items.filter((it) => {
+      const matchSearch = q.length === 0 || it.id.toLowerCase().includes(q);
+      const matchFilter =
+        statusFilter === 'all' ? true : statusFilter === 'alert' ? it.status === 'alert' : it.status === 'good';
+      return matchSearch && matchFilter;
+    });
+  }, [items, searchQuery, statusFilter]);
 
   const onHistory = useCallback((id: string) => {
     setSelectedId(id);
@@ -114,6 +127,9 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
 
             {/* View Mode Selector */}
             <ViewModeSelector mode={mode} onChange={setMode} scheme={scheme} />
+            {/* Filter + Search */}
+            <FilterBar filter={statusFilter} onChange={setStatusFilter} scheme={scheme} />
+            <SearchBar value={searchQuery} onChangeText={setSearchQuery} scheme={scheme} />
 
             {/* Error state */}
             {!!error && (
@@ -131,7 +147,7 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
             {/* Content */}
             {mode === 'grid' && (
               <FlatList
-                data={items}
+                data={visibleItems}
                 key={'grid'}
                 numColumns={2}
                 contentContainerStyle={styles.gridContent}
@@ -146,7 +162,7 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
 
             {mode === 'card' && (
               <FlatList
-                data={items}
+                data={visibleItems}
                 key={'card'}
                 contentContainerStyle={styles.listContent}
                 ItemSeparatorComponent={() => <View style={styles.cardSeparator} />}
@@ -160,7 +176,7 @@ export default function PackagesModal({ isOpen, onClose }: { isOpen: boolean; on
 
             {mode === 'list' && (
               <FlatList
-                data={items}
+                data={visibleItems}
                 key={'list'}
                 contentContainerStyle={styles.listNarrow}
                 initialNumToRender={20}
