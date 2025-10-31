@@ -248,12 +248,15 @@ export default function AuthForm({ mode, onModeChange }: AuthFormProps) {
 
                 <AuthButton
                   label={isLogin ? 'Sign In' : 'Create Account'}
+                  variant="outline"
                   loadingLabel={isLogin ? 'Signing In...' : 'Creating Account...'}
                   isLoading={isLoading}
                   onPress={onSubmit}
-                  backgroundColor={cardColors.tint}
-                  textColor={primaryButtonTextColor}
+                  backgroundColor={cardColors.background}
+                  textColor={cardColors.text}
                   style={styles.primaryButton}
+                  borderColor={cardColors.tint}
+
                 />
 
                 {isLogin ? (
@@ -277,7 +280,7 @@ export default function AuthForm({ mode, onModeChange }: AuthFormProps) {
                     disabled={isLoading}
                     accessibilityRole="button"
                   >
-                    <Text style={[styles.switchLink, { color: cardColors.tint }]}>
+                    <Text style={[styles.switchLink, { color: cardColors.text }]}>
                       {isLogin ? 'Sign up' : 'Log in'}
                     </Text>
                   </TouchableOpacity>

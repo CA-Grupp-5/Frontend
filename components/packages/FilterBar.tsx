@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Pressable, Text, StyleSheet } from 'react-native';
-import Colors, { ThemeName } from '@/constants/Colors';
+import Colors, {Palette, ThemeName } from '@/constants/Colors';
 
 export type StatusFilter = 'all' | 'alert' | 'in_range';
 
@@ -41,7 +41,7 @@ export default function FilterBar({ filter, onChange, scheme }: Props) {
                 : { borderColor: border, borderWidth: 1 },
             ]}
           >
-            <Text style={[styles.optionText, { color: active ? '#fff' : text }]}>{opt.label}</Text>
+            <Text style={[styles.optionText, { color: active ? Palette.black : text }]}>{opt.label}</Text>
           </Pressable>
         );
       })}

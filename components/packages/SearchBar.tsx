@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, TextInput, Pressable, StyleSheet, TextInputProps } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import Colors, { ThemeName } from '@/constants/Colors';
-
+import Colors, {ThemeName } from '@/constants/Colors';
 type Props = {
   value: string;
   onChangeText: (text: string) => void;
@@ -58,17 +57,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 999,
     borderWidth: 1,
+    
   },
   input: {
     flex: 1,
-    paddingVertical: 2,
+    paddingVertical: 0, 
   },
   clearBtn: {
     paddingLeft: 6,
+    
   },
 });
 

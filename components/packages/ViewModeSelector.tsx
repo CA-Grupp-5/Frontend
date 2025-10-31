@@ -39,14 +39,14 @@ export default function ViewModeSelector({ mode, onChange, scheme }: Props) {
             style={[
               styles.option,
               active
-                ? { backgroundColor: scheme === 'light' ? Palette.highContrastTint : tint, borderWidth: 0 }
+                ? { backgroundColor: tint, borderWidth: 0 }
                 : { borderColor: border, borderWidth: 1 },
             ]}
           >
-            <FontAwesome name={icon as any} size={14} color={active ? Palette.white : text} />
+            <FontAwesome name={icon} size={14} color={active ? Palette.black : text} />
             <Text style={[
               styles.optionText,
-              { color: active ? Palette.white : Colors[scheme].text },
+              { color: active ? Palette.black : Colors[scheme].text },
             ]}>{m}</Text>
           </Pressable>
         );

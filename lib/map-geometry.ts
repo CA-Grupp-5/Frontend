@@ -3,7 +3,9 @@ import type { LngLat } from './mapbox';
 
 export type Bounds = { ne: LngLat; sw: LngLat };
 
-export function computeBoundsFromRoute(routeGeom: any): Bounds | null {
+export type LineStringGeometry = { type: 'LineString'; coordinates: LngLat[] };
+
+export function computeBoundsFromRoute(routeGeom: LineStringGeometry): Bounds | null {
   const coords = (routeGeom?.coordinates ?? []) as LngLat[];
   if (!Array.isArray(coords) || coords.length < 2) return null;
 
@@ -23,4 +25,3 @@ export function expandBoundsAround(center: LngLat, dLon: number, dLat: number): 
     sw: [lon - dLon, lat - dLat] as LngLat,
   };
 }
-
