@@ -43,7 +43,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <View style={[styles.screen, { backgroundColor: colors.backgroundSoft }]}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Dashboard</Text>

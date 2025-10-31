@@ -16,6 +16,8 @@
     "ios:prebuild": "npx expo prebuild && bun expo run:ios",
     "web": "bun run expo start --web",
     "t": "bunx jest",
+    "cover": "bun t --coverage",
+    "coverage": "bun t --coverage",
     "format": "bun run prettier --write .",
     "format:check": "bun run prettier --check .",
     "clean": "rm -rf node_modules; rm -rf ios/build; rm -rf ios/build; rm -rf ios/Pods; rm -rf ios/Podfile.lock; rm -rf ~/Library/Developer/Xcode/DerivedData/",

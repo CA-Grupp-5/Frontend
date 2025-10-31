@@ -125,7 +125,7 @@ export default function AuthForm({ mode, onModeChange }: AuthFormProps) {
 
   return (
     <View style={styles.screen} className="flex-1 bg-palette-gray-50 dark:bg-palette-gray-900">
-      <StatusBar style="light" />
+      <StatusBar style="auto" />
       <Ornaments />
 
       <KeyboardAvoidingView

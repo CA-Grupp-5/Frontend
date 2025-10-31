@@ -74,7 +74,7 @@ export default function TabTwoScreen() {
         <Text className="text-white font-semibold">Logout</Text>
       </TouchableOpacity>
 
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+      <StatusBar style={'auto'} />
     </SafeAreaView>
   );
 }
@@ -168,8 +168,7 @@ function SwitchRow({
         value={value}
         onValueChange={onValueChange}
         trackColor={{ false: Colors[theme].border, true: Colors[theme].tint }}
-        thumbColor={Platform.OS === 'android' ? (value ? Palette.white : Palette.white) : undefined}
-        ios_backgroundColor={Colors[theme].border}
+        thumbColor= {Palette.white}
       />
     </View>
   );
