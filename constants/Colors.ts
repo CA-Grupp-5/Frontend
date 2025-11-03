@@ -1,10 +1,4 @@
-// const tintColor = 'hsl(200, 90%, 55%)'; //old lighter version
-// const tintColor = 'hsl(200, 90%, 50%)'; //settled for a shade that still conveys cold while improving wcag
-// const tintColor = 'hsl(200, 90%, 50%)'; //settled for a shade that still conveys cold while improving wcag
 const tintColor = 'hsl(200, 90%, 46%)'; //settled for a shade that still conveys cold while improving wcag
-// const tintColor = '#169ED4'; 
-// const tintColor = 'hsl(197, 90%, 46%)'; 
-// const tintColor = 'hsl(197, 82%, 43%)'; 
 
 export type ThemeName = 'light' | 'dark';
 
@@ -12,20 +6,9 @@ export type ThemeName = 'light' | 'dark';
 export const Palette = {
   // Base
   white: 'hsl(0, 0%, 100%)',
-  // whiteSoft : 'hsl(200, 90%, 50%)',
   whiteSoft : 'hsl(220, 13%, 91%)', //gray-200 
-  // testing new blacks
-  // black: 'hsl(0, 0%, 0%)',
   black: 'hsl(0, 0%, 0%)',
-  // black: 'hsl(221, 49%, 8%)',
-  // black: 'hsl(219, 30%, 15%)',
-  // black: 'hsl(222, 47%, 11%)',
-  // black: 'hsl(200, 2%, 2%)',
-  // black: 'hsl(180, 2%, 9%)',
-  // black: 'hsl(180, 2%, 13%)',
-  // black: 'hsl(195, 12%, 7%)',
   
-
   // App-specific tint/brand color
   tint: tintColor,
 
@@ -46,13 +29,12 @@ export const Palette = {
   // Accents
   amber500: 'hsl(38, 92%, 50%)', // #f59e0b
 
-  // Status (used across multiple components)
+  // Status 
   success: 'hsl(142, 71%, 45%)',
   destructive: 'hsl(0, 84%, 60%)',
   highContrastTint:'hsl(200, 90%, 38%)',
 
 
-  // Overlay
   backdropOverlay: 'hsla(0, 0%, 0%, 0.5)', // rgba(0,0,0,0.5)
 
   // Neutral

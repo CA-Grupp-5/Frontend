@@ -1,5 +1,3 @@
-// makes sure dev client starts on my 192 ip and not on 127.
-
 #!/usr/bin/env node
 const os = require('os');
 const { spawn } = require('child_process');

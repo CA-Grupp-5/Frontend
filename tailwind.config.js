@@ -51,7 +51,6 @@ module.exports = {
           // Map marker
           'marker-truck': 'hsl(189, 78%, 37%)',
           
-          // Overlay
           'backdrop-overlay': 'hsla(0, 0%, 0%, 0.5)',
           
           // Neutral

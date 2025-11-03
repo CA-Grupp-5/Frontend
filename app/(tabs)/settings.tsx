@@ -20,7 +20,6 @@ export default function TabTwoScreen() {
   const setScannerVibrateOnScan = useSettingsStore((s) => s.setScannerVibrateOnScan);
 
   return (
-    // try gray or stone or zinc 200 
     <SafeAreaView className="flex-1 pt-2 items-center justify-start bg-gray-200 dark:bg-black">
       <Text className="text-xl font-bold text-dark dark:text-white">Settings</Text>
       {/* THEME SETTINGS */}
@@ -64,7 +63,7 @@ export default function TabTwoScreen() {
         />
       </View>
 
-      {/* Basic red logout button for testing */}
+      {/* Logout button  */}
       <TouchableOpacity
         className="mt-6 bg-red-600 px-8 py-3 flex-row items-center justify-center rounded-xl"
         onPress={() => logout()}

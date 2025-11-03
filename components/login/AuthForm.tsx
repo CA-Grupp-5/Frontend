@@ -1,4 +1,4 @@
-import React from 'react';
+import React ,{ useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -117,7 +117,7 @@ export default function AuthForm({ mode, onModeChange }: AuthFormProps) {
   };
 
   // Clear all form fields whenever switching between login/signup modes
-  React.useEffect(() => {
+  useEffect(() => {
     reset({ name: '', email: '', password: '', rememberMe: false });
   }, [mode, reset]);
 
