@@ -169,7 +169,7 @@ export default function DriverSheet({
             style={{
               borderWidth: scheme === 'light' ? 0 : 1,
               borderColor: tint,
-              backgroundColor: scheme === 'light' ? Palette.highContrastTint : undefined,
+              backgroundColor: scheme === 'light' ? Palette.white : undefined,
               borderRadius: 12,
               paddingVertical: 12,
               alignItems: 'center',
@@ -185,10 +185,10 @@ export default function DriverSheet({
             <FontAwesome
               name="phone"
               size={20}
-              color={scheme === 'light' ? Palette.white : tint}
+              color={scheme === 'light' ? Palette.black : tint}
               style={{ marginLeft: -34 }}
             />
-            <Text style={{ color: scheme === 'light' ? Palette.white : Colors[scheme].text, fontWeight: '600' }}>
+            <Text style={{ color: scheme === 'light' ? Palette.black : Colors[scheme].text, fontWeight: '600' }}>
               Call 
             </Text>
           </Pressable>

@@ -1,6 +1,6 @@
 import { useColorScheme } from 'nativewind';
 import { StatusBar } from 'expo-status-bar';
-import { Platform, Text, View, TouchableOpacity, Pressable, Switch } from 'react-native';
+import {  Text, View, TouchableOpacity, Pressable, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome } from '@expo/vector-icons';
 import { useAuthStore } from '@/stores/authStore';

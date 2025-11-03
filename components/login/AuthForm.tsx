@@ -54,7 +54,7 @@ export default function AuthForm({ mode, onModeChange }: AuthFormProps) {
   const inputBorderColor = 'rgba(74, 85, 104, 0.8)';
   const placeholderTextColor = scheme === 'light' ? Colors.light.mutedText : '#cbd5e1';
   const inactiveCheckboxBorderColor = 'rgba(160, 174, 192, 0.5)';
-  const primaryButtonTextColor = scheme === 'dark' ? '#000000' : '#111827';
+  // const primaryButtonTextColor = scheme === 'dark' ? '#000000' : '#111827';
 
   const onSubmit = handleSubmit(
     async (values) => {
